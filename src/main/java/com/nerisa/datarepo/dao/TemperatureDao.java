@@ -1,0 +1,64 @@
+package com.nerisa.datarepo.dao;
+
+import com.nerisa.datarepo.model.Monument;
+import com.nerisa.datarepo.model.TemperatureData;
+import com.nerisa.datarepo.ontology.Connection;
+import com.nerisa.datarepo.ontology.SosaSchema;
+import com.nerisa.datarepo.utils.Constant;
+import org.apache.jena.ontology.Individual;
+import org.apache.jena.ontology.OntModel;
+
+/**
+ * Created by nerisa on 3/27/18.
+ */
+public class TemperatureDao {
+
+    private static OntModel model = Connection.getModel();
+
+    public static void addTemperatureData(TemperatureData temperatureData, Monument monument){
+
+        String temperatureResourceUri = temperatureData.retrieveTemperatureUri(monument);
+        Individual placeIndividual = model.getIndividual(monument.getMonumentUri()+ Constant.LOCATION_URI);
+
+        Individual temperatureIndividual = model.createIndividual(temperatureResourceUri, SosaSchema.OBSERVATION);
+        temperatureIndividual.addProperty(SosaSchema.OBSERVES, getTemperatureTypeResource());
+
+        Individual resultIndividual = model.createIndividual(temperatureResourceUri+Constant.RESULT_URI, SosaSchema.RESULT);
+        resultIndividual.addLiteral(model.getProperty(Constant.QUDT + "numericValue"), temperatureData.getValue());
+        resultIndividual.addProperty(model.getProperty(Constant.QUDT + "unit"),getUnitIndividual());
+
+        temperatureIndividual.addLiteral(SosaSchema.RESULT_TIME, temperatureData.getDate());
+        temperatureIndividual.addProperty(SosaSchema.HAS_RESULT, resultIndividual);
+        temperatureIndividual.addProperty(SosaSchema.HAS_FEATURE_OF_INTEREST, placeIndividual);
+        temperatureIndividual.addProperty(SosaSchema.MADE_BY_SENSOR, getSensorIndividual());
+
+        model.commit();
+
+
+    }
+
+    public static Individual getTemperatureTypeResource(){
+        Individual tempIndividual = model.getIndividual("http://com.nerisa.thesis/1.0#temperature");
+        if (tempIndividual == null){
+            tempIndividual = model.createIndividual("http://com.nerisa.thesis/1.0#temperature", SosaSchema.OBSERVED_PROPERTY);
+        }
+        return  tempIndividual;
+    }
+
+    public static Individual getUnitIndividual(){
+        Individual unitIndividual = model.getIndividual("http://com.nerisa.thesis/1.0#DegreeCelcius");
+        if(unitIndividual == null){
+            unitIndividual  = model.createIndividual("http://com.nerisa.thesis/1.0#DegreeCelcius", model.getOntClass(Constant.QUDT+"TemperatureUnit"));
+        }
+        return unitIndividual;
+    }
+
+    public static Individual getSensorIndividual(){
+        Individual sensorIndividual = model.getIndividual("http://api.openweathermap.org/data/2.5/weather");
+        if(sensorIndividual == null){
+            sensorIndividual = model.createIndividual("http://api.openweathermap.org/data/2.5/weather", SosaSchema.SENSOR);
+        }
+        return sensorIndividual;
+    }
+
+}
