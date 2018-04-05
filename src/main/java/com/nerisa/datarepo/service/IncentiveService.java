@@ -28,7 +28,7 @@ public class IncentiveService {
             if((previousLevel != null && previousLevel != nextLevel) || (previousLevel == null && nextLevel != null)){
                 //todo send upgrade notification
                 LOG.log(Level.INFO, "User " + user.getId() + " has upgraded to " + nextLevel.toString());
-
+                NotificationService.sendLevelUpgradeNotification(user, nextLevel);
             }
         }catch (SQLException e ){
             LOG.log(Level.SEVERE, "Error: " + e.getMessage());

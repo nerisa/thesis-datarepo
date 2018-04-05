@@ -173,16 +173,13 @@ public class MonumentService {
                 savedWarning = DatabaseQuery.saveWarning(warning, monumentId);
                 custodian = DatabaseQuery.getUser(monument.getCustodian().getId());
                 //todo move to notification service
-                Notification notification = new Notification("New warning", "A new warning has been posted for your monument", custodian.getToken());
-                JSONObject warningObject = savedWarning.prepareNotificationBody(monumentId);
-                notification.sendNotification(warningObject);
+                NotificationService.sendNewWarningNotification(savedWarning, monumentId, custodian);
                 IncentiveService.addIncentive(custodian, warning);
             }
 
         } catch(Exception e){
             e.printStackTrace();
         }
-        //TODO get the token for user of the monument
 
         return savedWarning;
     }
@@ -238,7 +235,8 @@ public class MonumentService {
             } else {
                 DatabaseQuery.deleteWarning(warning);
             }
-            IncentiveService.addIncentive(monument.getCustodian(),warning);
+            User user = DatabaseQuery.getUser(monument.getCustodian().getId());
+            IncentiveService.addIncentive(user,warning);
         } catch (Exception e){
             e.printStackTrace();
         }

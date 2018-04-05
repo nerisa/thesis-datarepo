@@ -17,11 +17,16 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createUser(User user){
-        user = MonumentService.createUser(user);
-        if (user.getId() == null) {
+        try {
+            user = MonumentService.createUser(user);
+            if (user.getId() == null) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            } else {
+                return Response.status(Response.Status.CREATED).entity(user).build();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } else {
-            return Response.status(Response.Status.CREATED).entity(user).build();
         }
     }
 

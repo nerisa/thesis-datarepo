@@ -27,7 +27,11 @@ public class MonumentResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createMonument(Monument monument){
         LOG.log(Level.INFO, "Adding a new monument");
-        MonumentService.saveMonument(monument);
+        try {
+            MonumentService.saveMonument(monument);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return Response.status(Response.Status.OK).entity(monument).build();
     }
 
