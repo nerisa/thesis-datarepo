@@ -7,9 +7,11 @@ public enum CustodianTask {
 
     ADD_WIKI(200),
     ADD_NEW(300),
-    ADD_INFO(100),
+    ADD_INFO(50),
     ADD_ENV_DATA(100),
-    ADD_PHOTO(100);
+    ADD_PHOTO(100),
+    VERIFY_FIRST(200),
+    VERIFY_WARNING(100);
 
 
     private final int score;

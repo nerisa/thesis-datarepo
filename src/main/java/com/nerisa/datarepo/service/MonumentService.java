@@ -52,24 +52,6 @@ public class MonumentService {
         return nearbyMonuments;
     }
 
-    public static List<Monument> getAllMonuments(){
-        Monument m1 = new Monument(1l,"Sud Paris", "me", "Hellooooo", "Hellooooo", 48.624061, 2.444167);
-        Monument m2 = new Monument(2l, "rue Charles Fourier", "me", "Hellooooo", "Hellooooo",48.625082, 2.443458);
-        Monument m3 = new Monument(3l,"Paul Eluard", "me", "Hellooooo", "Hellooooo",48.623109, 2.443289);
-        Monument m4 = new Monument(4l,"Coquibus", "me", "Hellooooo", "Hellooooo",48.623458, 2.441631);
-        Monument m5 = new Monument(5l,"Genescope", "me", "Hellooooo","Hellooooo", 48.623590, 2.439283);
-        Monument m6 = new Monument(6l,"Buddhist Temple", "me", "Hellooooo","Hellooooo", 48.627267, 2.443837);
-        Monument m7 = new Monument(7l,"Cemetary", "me", "Hellooooo","Hellooooo", 48.627608, 2.439138);
-        List<Monument> monuments = new ArrayList<Monument>();
-        monuments.add(m1);
-        monuments.add(m2);
-        monuments.add(m3);
-        monuments.add(m4);
-        monuments.add(m5);
-        monuments.add(m6);
-        monuments.add(m7);
-        return monuments;
-    }
 
     public static Monument getMonument(Long id){
         Monument monument = null;
@@ -91,6 +73,7 @@ public class MonumentService {
             }
             post.setId(postId);
             PostDao.createPost(post, monument);
+            IncentiveService.addIncentive(monument.getCustodian(), post);
             DatabaseQuery.incrementPostId(monument.getId());
         } catch (Exception e){
             e.printStackTrace();
@@ -99,14 +82,6 @@ public class MonumentService {
     }
 
     public static List<Post> getPosts(Long monumentId){
-//        Post post1 = new Post("I was here", new Date().getTime());
-//        Post post2 = new Post("I was here2", new Date().getTime());
-//        Post post3 = new Post("I was here3", new Date().getTime());
-//        List<Post> postList = new ArrayList<Post>();
-//        postList.add(post1);
-//        postList.add(post2);
-//        postList.add(post3);
-//        return postList;
         Monument monument = new Monument();
         monument.setId(monumentId);
         List<Post> posts = new ArrayList<Post>();
@@ -172,11 +147,7 @@ public class MonumentService {
             DatabaseQuery.addMonumentResourceIds(monumentId, warningCount,postCount,tempCount,noiseCount);
             DatabaseQuery.incrementMonumentId();
             DatabaseQuery.changeCustodianStatus(Boolean.TRUE, custodian);
-            if(monument.getReference()!= null){
-                IncentiveService.addIncentive(custodian, CustodianTask.ADD_WIKI);
-            } else {
-                IncentiveService.addIncentive(custodian, CustodianTask.ADD_NEW);
-            }
+            IncentiveService.addIncentive(custodian, monument);
             DatabaseQuery.updateMonumentId(custodian, monumentId);
             LOG.log(Level.INFO, "Monument saved for " + monument.getName());
             return monument;
@@ -184,9 +155,6 @@ public class MonumentService {
             e.printStackTrace();
             return null;
         }
-
-
-
     }
 
 
@@ -197,16 +165,20 @@ public class MonumentService {
         if(monument == null){
             return null;
         }
+        User custodian = null;
         try {
             if(monument.getCustodian().getId() == warning.getUserId()){
                 savedWarning = addVerifiedWarning(warning, monument);
             } else {
                 savedWarning = DatabaseQuery.saveWarning(warning, monumentId);
-                User custodian = DatabaseQuery.getUser(monument.getCustodian().getId());
+                custodian = DatabaseQuery.getUser(monument.getCustodian().getId());
+                //todo move to notification service
                 Notification notification = new Notification("New warning", "A new warning has been posted for your monument", custodian.getToken());
                 JSONObject warningObject = savedWarning.prepareNotificationBody(monumentId);
                 notification.sendNotification(warningObject);
+                IncentiveService.addIncentive(custodian, warning);
             }
+
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -226,6 +198,8 @@ public class MonumentService {
             WarningDao.createWarning(warning, monument, warningId);
             DatabaseQuery.incrementWarningId(monument.getId());
             warning.setVerified(Boolean.TRUE);
+            User custodian = DatabaseQuery.getUser(monument.getCustodian().getId());
+            IncentiveService.addIncentive(custodian,warning);
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -253,14 +227,18 @@ public class MonumentService {
     }
 
     public static void changeWarningStatus(Warning warning, Long monumentId){
-        Monument monument = new Monument();
-        monument.setId(monumentId);
+       Monument monument = MonumentDao.getMonument(monumentId);
         try {
-            Long verifiedWarningId = DatabaseQuery.getNextWarningId(monumentId);
-            WarningDao.createWarning(warning, monument, verifiedWarningId);
-            DatabaseQuery.incrementWarningId(monumentId);
-            DatabaseQuery.deleteWarning(warning);
-
+            if(warning.isVerified()) {
+                Long verifiedWarningId = DatabaseQuery.getNextWarningId(monumentId);
+                WarningDao.createWarning(warning, monument, verifiedWarningId);
+                DatabaseQuery.incrementWarningId(monumentId);
+                DatabaseQuery.deleteWarning(warning);
+                warning.setId(verifiedWarningId);
+            } else {
+                DatabaseQuery.deleteWarning(warning);
+            }
+            IncentiveService.addIncentive(monument.getCustodian(),warning);
         } catch (Exception e){
             e.printStackTrace();
         }
