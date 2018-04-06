@@ -48,4 +48,8 @@ public class NoiseData {
     public String retrieveNoiseUri(Monument monument){
         return monument.getMonumentUri() + Constant.NOISE_BASE_URI + "/" + getId();
     }
+
+    public String retrieveNoiseUri(Long monumentId){
+        return Monument.createMonumentUri(monumentId) + Constant.NOISE_BASE_URI + "/" + getId();
+    }
 }

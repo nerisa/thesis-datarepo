@@ -6,6 +6,7 @@ import com.nerisa.datarepo.model.Post;
 import com.nerisa.datarepo.model.TemperatureData;
 import com.nerisa.datarepo.ontology.CidocSchema;
 import com.nerisa.datarepo.service.MonumentService;
+import org.json.simple.JSONObject;
 
 import javax.json.Json;
 import javax.ws.rs.*;
@@ -38,8 +39,13 @@ public class MonumentResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response get(@PathParam("id") Long id){
+    public Response get(@PathParam("id") Long id, @QueryParam("compact") boolean compact){
         Monument monument = MonumentService.getMonument(id);
-        return Response.status(Response.Status.OK).entity(monument).build();
+        if(compact){
+            JSONObject object = MonumentService.getConsolidateMonumentData(monument);
+            return Response.status(Response.Status.OK).entity(object).build();
+        } else {
+            return Response.status(Response.Status.OK).entity(monument).build();
+        }
     }
 }

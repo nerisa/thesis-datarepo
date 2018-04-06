@@ -20,5 +20,8 @@ public class Constant {
     public final static String NOISE_TYPE_URI = "http://com.nerisa.thesis/1.0#noise";
     public final static String USER_BASE_URI =  "http://com.nerisa.thesis/1.0/user";
 
+    public final static long DAY_IN_MS = 1000 * 60 * 60 * 24;
+    public final static int OLD_DATA_DAYS = 7;
+
 
 }

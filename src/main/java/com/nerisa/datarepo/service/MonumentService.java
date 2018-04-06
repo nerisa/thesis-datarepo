@@ -7,6 +7,7 @@ import com.nerisa.datarepo.model.*;
 import com.nerisa.datarepo.ontology.CidocSchema;
 import com.nerisa.datarepo.ontology.GeoSchema;
 import com.nerisa.datarepo.rdbms.DatabaseQuery;
+import com.nerisa.datarepo.utils.Constant;
 import com.nerisa.datarepo.utils.Utility;
 import org.json.simple.JSONObject;
 
@@ -172,7 +173,6 @@ public class MonumentService {
             } else {
                 savedWarning = DatabaseQuery.saveWarning(warning, monumentId);
                 custodian = DatabaseQuery.getUser(monument.getCustodian().getId());
-                //todo move to notification service
                 NotificationService.sendNewWarningNotification(savedWarning, monumentId, custodian);
                 IncentiveService.addIncentive(custodian, warning);
             }
@@ -285,6 +285,59 @@ public class MonumentService {
             LOG.log(Level.SEVERE, e.getMessage());
         }
         return success;
+    }
+
+    public static void addNoise(Monument monument, NoiseData noise){
+        LOG.log(Level.INFO, "Adding noise for monument " + monument.getId());
+        try {
+            Long noiseId = DatabaseQuery.getNextNoiseId(monument.getId());
+            noise.setId(noiseId);
+            NoiseDao.addNoiseData(noise, monument);
+            DatabaseQuery.incrementNoiseId(monument.getId());
+            User user = DatabaseQuery.getUser(monument.getCustodian().getId());
+            IncentiveService.addIncentive(user,noise);
+        }catch (SQLException e){
+            LOG.log(Level.SEVERE, e.getMessage());
+        }
+    }
+
+    public static JSONObject getConsolidateMonumentData(Monument monument){
+        JSONObject object = new JSONObject();
+        try {
+            object.put("name", monument.getName());
+            object.put("id", monument.getId());
+            object.put("latitude", monument.getLatitude());
+            object.put("longitude", monument.getLongitude());
+            object.put("warningCount", DatabaseQuery.getNextWarningId(monument.getId()) - 1);
+            object.put("postCount", DatabaseQuery.getNextPostId(monument.getId()) - 1);
+            object.put("monumentPhoto", monument.getMonumentPhoto());
+            object.put("custodian", monument.getCustodian());
+            if(monument.getReference() != null) {
+                object.put("reference", monument.getReference());
+            }
+            object.put("desc", monument.getDesc());
+
+        }catch (SQLException e){
+            LOG.log(Level.SEVERE, e.getMessage());
+        }
+        return object;
+
+    }
+
+    public static void checkUsersEngagement(){
+        Long oldTime = (System.currentTimeMillis() - (Constant.OLD_DATA_DAYS * Constant.DAY_IN_MS));
+        try {
+            List<User> custodians = DatabaseQuery.getAllOldCustodians();
+            for(User user: custodians){
+                Long latestNoiseId = DatabaseQuery.getNextNoiseId(user.getMonumentId()) - 1;
+                NoiseData noiseData = NoiseDao.getNoiseData(latestNoiseId, user.getMonumentId());
+                if (noiseData.getDate() < oldTime){
+                    //todo send notification to get data
+                }
+            }
+        }catch (SQLException e){
+            LOG.log(Level.SEVERE, e.getMessage());
+        }
     }
 
 }

@@ -3,6 +3,7 @@ package com.nerisa.datarepo.rdbms;
 import com.nerisa.datarepo.model.Monument;
 import com.nerisa.datarepo.model.User;
 import com.nerisa.datarepo.model.Warning;
+import com.nerisa.datarepo.utils.Constant;
 import org.apache.jena.base.Sys;
 
 import java.sql.*;
@@ -27,14 +28,17 @@ public class DatabaseQuery {
         Long monumentId = 0l;
         String query = "SELECT monument_id FROM " + APP_DATA_TABLE;
         Statement statement = null;
+        ResultSet resultSet = null;
         try {
             statement = dbCon.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 monumentId = resultSet.getLong("monument_id");
             }
         }finally {
             if (statement != null){ statement.close(); }
+            if (resultSet != null){ resultSet.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
         return monumentId;
     }
@@ -58,6 +62,7 @@ public class DatabaseQuery {
             }
         } finally {
             if (statement != null){ statement.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -73,6 +78,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null){ statement.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -88,6 +94,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null){ statement.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -109,6 +116,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null){ statement.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -118,6 +126,13 @@ public class DatabaseQuery {
         try {
             User user = getUser("st118437@ait.asia");
             System.out.println(user.getId());
+
+            int score = getUserScore(user);
+            System.out.println(score);
+
+            List<User> users = getAllOldCustodians();
+            System.out.println(users.get(0).getId());
+            System.out.println(users.size());
         }catch (SQLException e){
             e.printStackTrace();
         }
@@ -146,6 +161,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (ps != null){ ps.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -166,6 +182,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (ps != null){ ps.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -173,30 +190,55 @@ public class DatabaseQuery {
         Long tempId = 0l;
         String selectQuery = "SELECT temp_id FROM " +  MONUMENT_TABLE + " WHERE monument_id = " + monumentId;
         Statement statement = null;
+        ResultSet resultSet = null;
         try {
             statement = dbCon.createStatement();
-            ResultSet resultSet = statement.executeQuery(selectQuery);
+            resultSet = statement.executeQuery(selectQuery);
             while (resultSet.next()) {
-                tempId = resultSet.getLong("post_id") + 1;
+                tempId = resultSet.getLong("temp_id") + 1;
             }
         }finally {
             if (statement != null){ statement.close(); }
+            if (resultSet != null){ resultSet.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
         return tempId;
+    }
+
+    public static Long getNextNoiseId(Long monumentId) throws SQLException{
+        Long noiseId = 0l;
+        String selectQuery = "SELECT noise_id FROM " +  MONUMENT_TABLE + " WHERE monument_id = " + monumentId;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        try {
+            statement = dbCon.createStatement();
+            resultSet = statement.executeQuery(selectQuery);
+            while (resultSet.next()) {
+                noiseId = resultSet.getLong("noise_id") + 1;
+            }
+        }finally {
+            if (statement != null){ statement.close(); }
+            if (resultSet != null){ resultSet.close(); }
+//            if (dbCon != null){ dbCon.close(); }
+        }
+        return noiseId;
     }
 
     public static Long getNextPostId(Long monumentId) throws SQLException{
         Long postId = 0l;
         String selectQuery = "SELECT post_id FROM " +  MONUMENT_TABLE + " WHERE monument_id = " + monumentId;
         Statement statement = null;
+        ResultSet resultSet = null;
         try {
             statement = dbCon.createStatement();
-            ResultSet resultSet = statement.executeQuery(selectQuery);
+            resultSet = statement.executeQuery(selectQuery);
             while (resultSet.next()) {
                 postId = resultSet.getLong("post_id") + 1;
             }
         }finally {
             if (statement != null){ statement.close(); }
+            if (resultSet != null){ resultSet.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
         return postId;
     }
@@ -206,14 +248,17 @@ public class DatabaseQuery {
         Long warningId = 0l;
         String selectQuery = "SELECT warning_id FROM " +  MONUMENT_TABLE + " WHERE monument_id = " + monumentId;
         Statement statement = null;
+        ResultSet resultSet = null;
         try {
             statement = dbCon.createStatement();
-            ResultSet resultSet = statement.executeQuery(selectQuery);
+            resultSet = statement.executeQuery(selectQuery);
             while (resultSet.next()) {
                 warningId = resultSet.getLong("warning_id") + 1;
             }
         }finally {
             if (statement != null){ statement.close(); }
+            if (resultSet != null){ resultSet.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
         return warningId;
     }
@@ -222,6 +267,7 @@ public class DatabaseQuery {
         String insertQuery = "INSERT INTO " + WARNING_TABLE + " (monument_id, image, description, date) VALUES (?,?,?,?)";
         LOG.log(Level.INFO, "Inserting a new unverified warning for monument "+ monumentId);
         PreparedStatement statement = null;
+        ResultSet generatedKeys = null;
         try {
             statement = dbCon.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, monumentId);
@@ -233,7 +279,7 @@ public class DatabaseQuery {
                 LOG.log(Level.SEVERE, "Could not insert warning data for " + monumentId);
                 throw new SQLException("Could not delete warning data for " + monumentId);
             }
-            ResultSet generatedKeys = statement.getGeneratedKeys();
+            generatedKeys = statement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 warning.setId(generatedKeys.getLong(1));
             } else {
@@ -242,6 +288,8 @@ public class DatabaseQuery {
             }
         } finally {
             if (statement != null){ statement.close(); }
+            if (generatedKeys != null){ generatedKeys.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
         return warning;
     }
@@ -259,6 +307,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null){ statement.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -267,9 +316,10 @@ public class DatabaseQuery {
         String query = "SELECT * FROM " + WARNING_TABLE + " WHERE monument_id = " + monument.getId();
         LOG.log(Level.INFO, "Getting warnings: " + query);
         Statement statement = null;
+        ResultSet result = null;
         try {
             statement = dbCon.createStatement();
-            ResultSet result = statement.executeQuery(query);
+            result = statement.executeQuery(query);
             while (result.next()) {
                 Warning warning = new Warning();
                 warning.setId(result.getLong("id"));
@@ -281,6 +331,8 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null){ statement.close(); }
+            if (result != null){ result.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
         return warningList;
     }
@@ -289,6 +341,7 @@ public class DatabaseQuery {
         String query = "INSERT INTO " + USER_TABLE + "(email, token, is_custodian, last_logged_in) VALUES (?,?,?,?)";
         LOG.log(Level.INFO, "Creating new user "+ user.getEmail());
         PreparedStatement statement = null;
+        ResultSet generatedKeys = null;
         try {
             statement = dbCon.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, user.getEmail());
@@ -300,7 +353,7 @@ public class DatabaseQuery {
                 LOG.log(Level.SEVERE, "Could not insert user data for " + user.getEmail());
                 throw new SQLException("Could not insert user data for " + user.getEmail());
             }
-            ResultSet generatedKeys = statement.getGeneratedKeys();
+            generatedKeys = statement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 user.setId(generatedKeys.getLong(1));
             } else {
@@ -309,6 +362,8 @@ public class DatabaseQuery {
             }
         } finally {
             if (statement != null){ statement.close(); }
+            if (generatedKeys != null){ generatedKeys.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
         return user;
     }
@@ -330,9 +385,8 @@ public class DatabaseQuery {
                 throw new SQLException("Could not update user token for " + user.getEmail());
             }
         } finally {
-            if (statement != null) {
-                statement.close();
-            }
+            if (statement != null) { statement.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
         return Boolean.TRUE;
     }
@@ -342,9 +396,10 @@ public class DatabaseQuery {
         String query = "SELECT * FROM " + USER_TABLE + " WHERE id = " + id;
         LOG.log(Level.INFO, "Getting user with query: " + query);
         Statement statement = null;
+        ResultSet resultSet = null;
         try {
             statement = dbCon.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 user.setId(id);
                 user.setEmail(resultSet.getString("email"));
@@ -354,6 +409,8 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null){ statement.close(); }
+            if (resultSet != null){ resultSet.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
         return user;
     }
@@ -363,9 +420,10 @@ public class DatabaseQuery {
         String query = "SELECT * FROM " + USER_TABLE + " WHERE email = '" + email + "'";
         LOG.log(Level.INFO, "Getting user with query: " + query);
         Statement statement = null;
+        ResultSet resultSet = null;
         try {
             statement = dbCon.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
+            resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 user.setId(resultSet.getLong("id"));
                 user.setEmail(resultSet.getString("email"));
@@ -375,6 +433,8 @@ public class DatabaseQuery {
             }
         } finally {
             if (statement != null){ statement.close(); }
+            if (resultSet != null){ resultSet.close(); }
+//            if (dbCon != null){ dbCon.close(); }
         }
         return user;
     }
@@ -445,9 +505,10 @@ public class DatabaseQuery {
         String selectQuery = "SELECT score FROM " + USER_TABLE + " WHERE id = " + user.getId();
         int userScore = 0;
         Statement statement = null;
+        ResultSet resultSet = null;
         try {
             statement = dbCon.createStatement();
-            ResultSet resultSet = statement.executeQuery(selectQuery);
+            resultSet = statement.executeQuery(selectQuery);
             while (resultSet.next()) {
                 userScore = resultSet.getInt("score");
             }
@@ -456,5 +517,33 @@ public class DatabaseQuery {
                 statement.close();
         }
         return userScore;
+    }
+
+    public static List<User> getAllOldCustodians() throws SQLException{
+        Long oneWeekBefore = (System.currentTimeMillis() - (Constant.OLD_DATA_DAYS * Constant.DAY_IN_MS));
+        List<User> userList = new ArrayList<User>();
+        String query = "SELECT * FROM " + USER_TABLE + " WHERE (last_logged_in < " + oneWeekBefore + ") AND (is_custodian = 1)";
+        LOG.log(Level.INFO, "Getting old custodians query: " + query);
+        ResultSet resultSet = null;
+        Statement statement = null;
+        try{
+            statement = dbCon.createStatement();
+            resultSet = statement.executeQuery(query);
+            while (resultSet.next()){
+                User user = new User();
+                user.setId(resultSet.getLong("id"));
+                user.setCustodian(Boolean.TRUE);
+                user.setMonumentId(resultSet.getLong("monument_id"));
+                user.setToken(resultSet.getString("token"));
+                user.setLastLoggedIn(resultSet.getLong("last_logged_in"));
+                user.setEmail(resultSet.getString("email"));
+                userList.add(user);
+            }
+        }finally {
+            if (statement != null) { statement.close();}
+            if (resultSet != null){ resultSet.close(); }
+//            if (dbCon != null){ dbCon.close(); }
+        }
+        return userList;
     }
 }
