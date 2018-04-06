@@ -6,6 +6,7 @@ import com.nerisa.datarepo.model.User;
 import com.nerisa.datarepo.model.Warning;
 import org.json.simple.JSONObject;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -27,5 +28,13 @@ public class NotificationService {
         incentiveObject.put("level", level.toString());
         incentiveObject.put("type", "incentive");
         notification.sendNotification(incentiveObject);
+    }
+
+    public static void sendGetDataNotification(User user){
+        LOG.log(Level.INFO,"Sending notification to user " + user.getId());
+        Notification notification = new Notification("Reminder!", "Its been a long time since you added data for your monument. Go to your profile to add data and gain point.", user.getToken());
+        JSONObject getDataObject = new JSONObject();
+        getDataObject.put("type", "get_data");
+        notification.sendNotification(getDataObject);
     }
 }

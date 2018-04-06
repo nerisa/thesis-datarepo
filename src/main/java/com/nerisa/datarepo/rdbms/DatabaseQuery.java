@@ -1,16 +1,22 @@
 package com.nerisa.datarepo.rdbms;
 
+import com.nerisa.datarepo.job.UserEngagementJob;
 import com.nerisa.datarepo.model.Monument;
 import com.nerisa.datarepo.model.User;
 import com.nerisa.datarepo.model.Warning;
 import com.nerisa.datarepo.utils.Constant;
 import org.apache.jena.base.Sys;
+import org.quartz.*;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 /**
  * Created by nerisa on 3/28/18.
@@ -123,19 +129,20 @@ public class DatabaseQuery {
 
 
     public static void main(String[] args){
-        try {
-            User user = getUser("st118437@ait.asia");
-            System.out.println(user.getId());
+//        try {
+//            User user = getUser("st118437@ait.asia");
+//            System.out.println(user.getId());
+//
+//            int score = getUserScore(user);
+//            System.out.println(score);
+//
+//            List<User> users = getAllOldCustodians();
+//            System.out.println(users.get(0).getId());
+//            System.out.println(users.size());
+//        }catch (SQLException e){
+//            e.printStackTrace();
+//        }
 
-            int score = getUserScore(user);
-            System.out.println(score);
-
-            List<User> users = getAllOldCustodians();
-            System.out.println(users.get(0).getId());
-            System.out.println(users.size());
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
     }
 
     public static void incrementWarningId(Long monumentId) throws SQLException{
@@ -520,7 +527,8 @@ public class DatabaseQuery {
     }
 
     public static List<User> getAllOldCustodians() throws SQLException{
-        Long oneWeekBefore = (System.currentTimeMillis() - (Constant.OLD_DATA_DAYS * Constant.DAY_IN_MS));
+//        Long oneWeekBefore = (System.currentTimeMillis() - (Constant.OLD_DATA_DAYS * Constant.DAY_IN_MS));
+        Long oneWeekBefore = System.currentTimeMillis();
         List<User> userList = new ArrayList<User>();
         String query = "SELECT * FROM " + USER_TABLE + " WHERE (last_logged_in < " + oneWeekBefore + ") AND (is_custodian = 1)";
         LOG.log(Level.INFO, "Getting old custodians query: " + query);

@@ -1,17 +1,9 @@
 package com.nerisa.datarepo.service;
 
 import com.nerisa.datarepo.dao.*;
-import com.nerisa.datarepo.firebase.Notification;
-import com.nerisa.datarepo.incentive.CustodianTask;
 import com.nerisa.datarepo.model.*;
-import com.nerisa.datarepo.ontology.CidocSchema;
-import com.nerisa.datarepo.ontology.GeoSchema;
 import com.nerisa.datarepo.rdbms.DatabaseQuery;
-import com.nerisa.datarepo.utils.Constant;
-import com.nerisa.datarepo.utils.Utility;
 import org.json.simple.JSONObject;
-
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -301,6 +293,18 @@ public class MonumentService {
         }
     }
 
+    public static void addTemperature(Monument monument, TemperatureData temperatureData){
+        LOG.log(Level.INFO, "Adding temperature data for monument " + monument.getId());
+        try{
+            Long temperatureId = DatabaseQuery.getNextTemperatureId(monument.getId());
+            temperatureData.setId(temperatureId);
+            TemperatureDao.addTemperatureData(temperatureData, monument);
+            DatabaseQuery.incrementTemperatureId(monument.getId());
+        }catch (SQLException e){
+            LOG.log(Level.SEVERE, e.getMessage());
+        }
+    }
+
     public static JSONObject getConsolidateMonumentData(Monument monument){
         JSONObject object = new JSONObject();
         try {
@@ -323,21 +327,4 @@ public class MonumentService {
         return object;
 
     }
-
-    public static void checkUsersEngagement(){
-        Long oldTime = (System.currentTimeMillis() - (Constant.OLD_DATA_DAYS * Constant.DAY_IN_MS));
-        try {
-            List<User> custodians = DatabaseQuery.getAllOldCustodians();
-            for(User user: custodians){
-                Long latestNoiseId = DatabaseQuery.getNextNoiseId(user.getMonumentId()) - 1;
-                NoiseData noiseData = NoiseDao.getNoiseData(latestNoiseId, user.getMonumentId());
-                if (noiseData.getDate() < oldTime){
-                    //todo send notification to get data
-                }
-            }
-        }catch (SQLException e){
-            LOG.log(Level.SEVERE, e.getMessage());
-        }
-    }
-
 }

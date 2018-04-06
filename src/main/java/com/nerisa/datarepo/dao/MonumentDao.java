@@ -8,6 +8,7 @@ import com.nerisa.datarepo.ontology.SosaSchema;
 import com.nerisa.datarepo.service.MonumentService;
 import com.nerisa.datarepo.utils.Constant;
 import com.nerisa.datarepo.utils.Utility;
+import jdk.nashorn.api.scripting.JSObject;
 import org.apache.jena.ontology.*;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Literal;
@@ -16,12 +17,14 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.json.simple.JSONObject;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -183,9 +186,6 @@ public class MonumentDao {
             for (; results.hasNext(); ){
                 QuerySolution soln = results.nextSolution();
                 Resource place = (Resource) soln.get("?place");
-                System.out.println(">>>>>>>>>checck this>>>>>>>>>>>>>>>>>");
-                System.out.println(place.getURI());
-                System.out.println("===============================================");
                 monumentList.add(getMonumentLocateAt(place.getURI()));
             }
         } finally {
@@ -222,7 +222,7 @@ public class MonumentDao {
                 "   ?X a <" + CidocSchema.E38_IMAGE.getURI() + "> ." +
                 "   ?X <" + CidocSchema.P138_REPRESENTS.getURI() + "> <" + representedUri + ">" +
                 "}";
-        System.out.println(queryString);
+        LOG.log(Level.INFO, "Getting image with query: " + queryString);
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.create(query, model);
         try {
@@ -248,17 +248,46 @@ public class MonumentDao {
 //        PostDao.createPost(posts.get(0), monument);
 //        TemperatureDao.addTemperatureData(temp, monument);
 //
-        OutputStream outFile = null;
-        try {
-            outFile = new FileOutputStream("/home/nerisa/codehome/project/java/thesis/src/main/resources/output2.rdfs", false);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        RDFDataMgr.write(outFile, model.getBaseModel(), RDFFormat.RDFXML_PLAIN);
+//        OutputStream outFile = null;
+//        try {
+//            outFile = new FileOutputStream("/home/nerisa/codehome/project/java/thesis/src/main/resources/output2.rdfs", false);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        RDFDataMgr.write(outFile, model.getBaseModel(), RDFFormat.RDFXML_PLAIN);
 
 //        getMonument(1l);
 
 //        createMonument(new Monument(400l,"Sud Paris", "me", "Hellooooo", "https://firebasestorage.googleapis.com/v0/b/custodian-3e7c1.appspot.com/o/images%2Fbc344dff-fff6-4f5f-a6ca-866d78fd7744?alt=media&token=6012ef75-5abb-4d70-8dcc-40fdb9ae1251", 48.624061, 2.444167));
 //        createMonument(new Monument(200l, "rue Charles Fourier", "me", "Hellooooo", "https://firebasestorage.googleapis.com/v0/b/custodian-3e7c1.appspot.com/o/images%2Fdff48770-ce01-4e0b-8d6d-4c643e030c69?alt=media&token=e8a2abe8-630e-44c7-8d91-0324325730ed", 48.625082, 2.443458));
+        List<HashMap<String,Double>> places = getAllMonumentLocations();
+        System.out.println(places.size());
+        for(HashMap object: places){
+            System.out.println("??????");
+            System.out.println(object.toString());
+        }
+    }
+
+    public static List<HashMap<String, Double>> getAllMonumentLocations(){
+        List<HashMap<String, Double>> places = new ArrayList();
+        String queryString = "SELECT ?place WHERE { " +
+                "   ?place a <" + CidocSchema.E53_PLACE.getURI() + "> .}";
+        LOG.log(Level.INFO, "Getting monument locations with query: " + queryString);
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory.create(query, model);
+        try {
+            ResultSet results = qexec.execSelect();
+            for (; results.hasNext(); ) {
+                HashMap<String,Double> place = new HashMap<String, Double>();
+                QuerySolution soln = results.nextSolution();
+                Resource placeResource = soln.get("?place").asResource();
+                place.put("lat", placeResource.getProperty(GeoSchema.LAT).getDouble());
+                place.put("long", placeResource.getProperty(GeoSchema.LONG).getDouble());
+                places.add(place);
+            }
+        }finally {
+            qexec.close();
+        }
+        return places;
     }
 }

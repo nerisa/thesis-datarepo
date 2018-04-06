@@ -16,4 +16,8 @@
         <servlet-name>Jersey Web Application</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
+    
+    <listener>
+        <listener-class>com.nerisa.datarepo.MyServletContextListener</listener-class>
+    </listener>
 </web-app>
