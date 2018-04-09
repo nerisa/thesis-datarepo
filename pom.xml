@@ -101,6 +101,24 @@
             <version>20180130</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-fuseki-embedded -->
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-fuseki-embedded</artifactId>
+            <version>3.6.0</version>
+
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-jdk14 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.25</version>
+
+        </dependency>
+
+
+
 
     </dependencies>
 

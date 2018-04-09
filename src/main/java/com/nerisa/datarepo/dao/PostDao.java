@@ -15,35 +15,50 @@ import org.apache.jena.rdf.model.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by nerisa on 3/27/18.
  */
 public class PostDao {
 
-    private static final OntModel model = Connection.getModel();
+//    private static final OntModel model = Connection.getModel();
 
-    public static void createPost(Post post, Monument monument){
-        String resourceBaseUri = monument.getMonumentUri();
-        String postBaseUri = resourceBaseUri + Constant.POST_BASE_URI + "/" + post.getId();
-        Individual monumentIndividual = model.getIndividual(resourceBaseUri);
-        Individual postIndividual = model.createIndividual(postBaseUri, CidocSchema.E5_EVENT);
+    private static final Logger LOG = Logger.getLogger(PostDao.class.getSimpleName());
 
-        Individual postType = model.createIndividual(Constant.POST_TYPE_URI, CidocSchema.E55_TYPE);
+    public static void createPost(Post post, Monument monument) {
+        OntModel model = Connection.getModel();
+        Connection.openDataSetForWrite();
+        LOG.log(Level.INFO, "Creating a new post for monument " + monument.getName());
+        try {
+            String resourceBaseUri = monument.getMonumentUri();
+            String postBaseUri = resourceBaseUri + Constant.POST_BASE_URI + "/" + post.getId();
+            Individual monumentIndividual = model.getIndividual(resourceBaseUri);
+            Individual postIndividual = model.createIndividual(postBaseUri, CidocSchema.E5_EVENT);
 
-        Individual postTime = model.createIndividual(postBaseUri + "/" + "time", CidocSchema.E52_TIME_SPAN);
-        postTime.addLiteral(CidocSchema.P82_AT_SOME_TIME_WITHIN, post.getDate());
+            Individual postType = model.createIndividual(Constant.POST_TYPE_URI, CidocSchema.E55_TYPE);
 
-        postIndividual.addProperty(CidocSchema.P8_TOOK_PLACE_ON_OR_WITHIN, monumentIndividual);
-        postIndividual.addProperty(CidocSchema.P2_HAS_TYPE, postType);
-        postIndividual.addProperty(CidocSchema.P4_HAS_TIME_SPAN, postTime);
-        postIndividual.addProperty(CidocSchema.P3_HAS_NOTE, post.getDesc());
+            Individual postTime = model.createIndividual(postBaseUri + "/" + "time", CidocSchema.E52_TIME_SPAN);
+            postTime.addLiteral(CidocSchema.P82_AT_SOME_TIME_WITHIN, post.getDate());
 
-        model.commit();
+            postIndividual.addProperty(CidocSchema.P8_TOOK_PLACE_ON_OR_WITHIN, monumentIndividual);
+            postIndividual.addProperty(CidocSchema.P2_HAS_TYPE, postType);
+            postIndividual.addProperty(CidocSchema.P4_HAS_TIME_SPAN, postTime);
+            postIndividual.addProperty(CidocSchema.P3_HAS_NOTE, post.getDesc());
+
+            model.commit();
+        } finally {
+            Connection.closeConnections();
+        }
 
     }
 
-    public static List<Post> getPosts(Monument monument){
+    public static List<Post> getPosts(Monument monument) {
+        OntModel model = Connection.getModel();
+        Connection.openDataSetForRead();
+        LOG.log(Level.INFO, "Getting posts for monument " + monument.getName());
+
         List<Post> posts = new ArrayList<Post>();
         String monumentResourceUri = monument.getMonumentUri();
 
@@ -53,26 +68,27 @@ public class PostDao {
                 "   ?post <" + CidocSchema.P8_TOOK_PLACE_ON_OR_WITHIN + "> <" + monumentResourceUri + "> }";
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.create(query, model);
-        try{
+        try {
             ResultSet results = qexec.execSelect();
-            for (; results.hasNext(); ){
+            for (; results.hasNext(); ) {
                 QuerySolution soln = results.nextSolution();
                 Resource postResource = (Resource) soln.get("?post");
-                System.out.println(postResource);
-                System.out.println(">>>>>>>>>>>>>>>>>>>");
                 posts.add(getPostDetails(postResource));
             }
         } finally {
             qexec.close();
+            Connection.closeConnections();
         }
         return posts;
     }
 
-    public static Post getPostDetails(Resource postResource){
+    public static Post getPostDetails(Resource postResource) {
+
         Resource timeResource = (Resource) postResource.getProperty(CidocSchema.P4_HAS_TIME_SPAN).getObject();
         Long time = timeResource.getProperty(CidocSchema.P82_AT_SOME_TIME_WITHIN).getLong();
         String desc = postResource.getProperty(CidocSchema.P3_HAS_NOTE).getString();
         Long postId = Utility.getMonumentChildResourceId(postResource.getURI());
         return new Post(postId, desc, time);
+
     }
 }

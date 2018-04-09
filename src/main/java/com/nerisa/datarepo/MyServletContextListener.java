@@ -1,6 +1,10 @@
 package com.nerisa.datarepo;
 
 import com.nerisa.datarepo.job.UserEngagementJob;
+import com.nerisa.datarepo.ontology.Connection;
+import org.apache.jena.fuseki.embedded.FusekiServer;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.tdb.TDBFactory;
 import org.quartz.*;
 
 import javax.servlet.ServletContextEvent;
@@ -20,7 +24,7 @@ public class MyServletContextListener implements ServletContextListener {
 
     private Scheduler sched = null;
     private static Logger LOG = Logger.getLogger(MyServletContextListener.class.getSimpleName());
-
+    FusekiServer server = null;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -47,9 +51,19 @@ public class MyServletContextListener implements ServletContextListener {
             sched.start();
             sched.scheduleJob(job, trigger);
 
+
+
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
+
+
+//        Dataset ds = TDBFactory.createDataset("/home/nerisa/codehome/project/java/thesis-datarepo/MyDatabases/test") ;
+        server = FusekiServer.create()
+                .setPort(3332)
+                .add("/ds", Connection.dataset, true)
+                .build() ;
+        server.start() ;
     }
 
     @Override
@@ -62,5 +76,6 @@ public class MyServletContextListener implements ServletContextListener {
         }catch (SchedulerException e){
             e.printStackTrace();
         }
+        if(server != null){ server.stop();}
     }
 }

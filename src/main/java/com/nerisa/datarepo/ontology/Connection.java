@@ -26,6 +26,7 @@ public class Connection {
 
     public static final String DATABASE = "/home/nerisa/codehome/project/java/thesis-datarepo/MyDatabases/test";
     public static OntModel model;
+    public static Dataset dataset = TDBFactory.createDataset(DATABASE);
 
     public static OntModel getModel(){
 
@@ -38,8 +39,6 @@ public class Connection {
         final OntModel qudtModel = ModelFactory.createOntologyModel( OntModelSpec.RDFS_MEM );
         qudtModel.read("/home/nerisa/codehome/project/java/thesis-datarepo/src/main/resources/qudt.owl");
 
-
-        Dataset dataset = TDBFactory.createDataset(DATABASE);
         Model model = dataset.getDefaultModel();
 
         final OntModel ontModel = ModelFactory.createOntologyModel(OntModelSpec.RDFS_MEM_RDFS_INF, model);
@@ -48,6 +47,19 @@ public class Connection {
         ontModel.addSubModel(sosaModel);
 
         return ontModel;
+    }
+
+    public static void closeConnections(){
+        if(model != null){model.close();}
+        if(dataset != null) {dataset.end();}
+    }
+
+    public static void openDataSetForRead(){
+        dataset.begin(ReadWrite.READ);
+    }
+
+    public static void openDataSetForWrite(){
+        dataset.begin(ReadWrite.WRITE);
     }
 
 //    public static void main(String[] args) {
