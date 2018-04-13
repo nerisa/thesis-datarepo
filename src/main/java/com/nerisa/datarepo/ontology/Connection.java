@@ -54,6 +54,13 @@ public class Connection {
         if(dataset != null) {dataset.end();}
     }
 
+    public static void commitTransaction(){
+        if(model != null){model.commit();}
+        if(dataset != null) {dataset.commit();}
+    }
+
+
+
     public static void openDataSetForRead(){
         dataset.begin(ReadWrite.READ);
     }

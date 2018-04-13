@@ -80,7 +80,7 @@ public class MonumentDao {
 
     public static void createMonument(Monument monument){
         OntModel model = Connection.getModel();
-        Connection.openDataSetForRead();
+        Connection.openDataSetForWrite();
         try {
             String monumentIri = monument.getMonumentUri();
             LOG.log(Level.INFO, "Creating new monument with url: " + monumentIri);
@@ -114,7 +114,7 @@ public class MonumentDao {
                 Individual referenceIndividual = model.createIndividual(monument.getReference(), CidocSchema.E31_DOCUMENT);
                 monumentResource.addProperty(CidocSchema.P70I_IS_DOCUMENTED_IN, referenceIndividual);
             }
-            model.commit();
+            Connection.commitTransaction();
         }finally {
             Connection.closeConnections();
         }
