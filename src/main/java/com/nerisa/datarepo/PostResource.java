@@ -19,7 +19,6 @@ public class PostResource {
 
     MonumentService monumentService = new MonumentService();
 
-    //TODO add user id to post
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

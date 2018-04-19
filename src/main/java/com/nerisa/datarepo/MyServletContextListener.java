@@ -44,7 +44,7 @@ public class MyServletContextListener implements ServletContextListener {
             Trigger trigger = newTrigger()
                     .withIdentity("engagementTrigger", "group1")
                     .startNow()
-                    .withSchedule(cronSchedule("0 0/5 * * * ?"))
+                    .withSchedule(cronSchedule("0 0 0/1 * * ?"))
                     .build();
 
             // Tell quartz to schedule the job using our trigger
