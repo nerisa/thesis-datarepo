@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -cp target/classes:target/dependency/* HelloWorld
+web: java -jar target/thesis-datarepo-1.0-SNAPSHOT.jar
