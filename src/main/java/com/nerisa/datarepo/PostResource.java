@@ -2,13 +2,11 @@ package com.nerisa.datarepo;
 
 import com.nerisa.datarepo.model.Monument;
 import com.nerisa.datarepo.model.Post;
-import com.nerisa.datarepo.model.Warning;
 import com.nerisa.datarepo.service.MonumentService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,15 +21,15 @@ public class PostResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createPost(@PathParam("id")Long id, Post post){
-        Monument monument = monumentService.getMonument(id);
-        Post savedPost = monumentService.addPost(post, monument);
+        Monument monument = MonumentService.getMonument(id);
+        Post savedPost = MonumentService.addPost(post, monument);
         return Response.status(Response.Status.OK).entity(savedPost).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPosts(@PathParam("id") Long id){
-        List<Post> postList = monumentService.getPosts(id);
+        List<Post> postList = MonumentService.getPosts(id);
         return Response.status(Response.Status.OK).entity(postList).build();
     }
 

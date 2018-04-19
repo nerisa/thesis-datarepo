@@ -1,14 +1,9 @@
 package com.nerisa.datarepo;
 
 import com.nerisa.datarepo.model.Monument;
-import com.nerisa.datarepo.model.NoiseData;
-import com.nerisa.datarepo.model.Post;
-import com.nerisa.datarepo.model.TemperatureData;
-import com.nerisa.datarepo.ontology.CidocSchema;
 import com.nerisa.datarepo.service.MonumentService;
 import org.json.simple.JSONObject;
 
-import javax.json.Json;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;

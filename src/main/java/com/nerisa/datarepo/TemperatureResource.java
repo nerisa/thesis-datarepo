@@ -1,7 +1,6 @@
 package com.nerisa.datarepo;
 
 import com.nerisa.datarepo.model.Monument;
-import com.nerisa.datarepo.model.NoiseData;
 import com.nerisa.datarepo.model.TemperatureData;
 import com.nerisa.datarepo.service.MonumentService;
 

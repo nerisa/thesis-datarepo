@@ -1,22 +1,14 @@
 package com.nerisa.datarepo.rdbms;
 
-import com.nerisa.datarepo.job.UserEngagementJob;
 import com.nerisa.datarepo.model.Monument;
 import com.nerisa.datarepo.model.User;
 import com.nerisa.datarepo.model.Warning;
-import com.nerisa.datarepo.utils.Constant;
-import org.apache.jena.base.Sys;
-import org.quartz.*;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
 
 /**
  * Created by nerisa on 3/28/18.

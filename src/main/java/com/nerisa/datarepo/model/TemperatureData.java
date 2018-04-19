@@ -1,9 +1,7 @@
 package com.nerisa.datarepo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nerisa.datarepo.utils.Constant;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**

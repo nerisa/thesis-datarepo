@@ -3,7 +3,10 @@ package com.nerisa.datarepo;
 import com.nerisa.datarepo.model.Monument;
 import com.nerisa.datarepo.service.MonumentService;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -21,7 +24,7 @@ public class MonumentsResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response getMonuments(@QueryParam("lat") double latitude, @QueryParam("lon") double longitude, @QueryParam("within") int within){
-        List<Monument> monuments = monumentService.getNearestMonuments(latitude, longitude, within);
+        List<Monument> monuments = MonumentService.getNearestMonuments(latitude, longitude, within);
         GenericEntity<List<Monument>> entity = new GenericEntity<List<Monument>>(monuments) {};
         return Response.status(200).entity(entity).build();
     }

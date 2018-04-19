@@ -1,8 +1,9 @@
 package com.nerisa.datarepo.ontology;
 
 
-import org.apache.jena.rdf.model.*;
 import org.apache.jena.ontology.*;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 
 /**
  * Vocabulary definitions from /home/nerisa/Desktop/CIDOCCRM_ecrm.owl 

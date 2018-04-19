@@ -1,7 +1,6 @@
 package com.nerisa.datarepo.model;
 
 import com.nerisa.datarepo.utils.Constant;
-import javafx.geometry.Pos;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

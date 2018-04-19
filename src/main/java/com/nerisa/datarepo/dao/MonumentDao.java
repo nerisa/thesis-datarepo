@@ -1,13 +1,15 @@
 package com.nerisa.datarepo.dao;
 
-import com.nerisa.datarepo.model.*;
+import com.nerisa.datarepo.model.Monument;
+import com.nerisa.datarepo.model.User;
 import com.nerisa.datarepo.ontology.CidocSchema;
 import com.nerisa.datarepo.ontology.Connection;
 import com.nerisa.datarepo.ontology.GeoSchema;
 import com.nerisa.datarepo.ontology.SosaSchema;
 import com.nerisa.datarepo.utils.Constant;
 import com.nerisa.datarepo.utils.Utility;
-import org.apache.jena.ontology.*;
+import org.apache.jena.ontology.Individual;
+import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Resource;
 

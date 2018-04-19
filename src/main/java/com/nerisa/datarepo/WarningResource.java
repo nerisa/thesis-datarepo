@@ -1,6 +1,5 @@
 package com.nerisa.datarepo;
 
-import com.nerisa.datarepo.model.Monument;
 import com.nerisa.datarepo.model.Warning;
 import com.nerisa.datarepo.service.MonumentService;
 

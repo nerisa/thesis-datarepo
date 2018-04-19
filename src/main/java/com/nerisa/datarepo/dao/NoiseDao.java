@@ -2,7 +2,6 @@ package com.nerisa.datarepo.dao;
 
 import com.nerisa.datarepo.model.Monument;
 import com.nerisa.datarepo.model.NoiseData;
-import com.nerisa.datarepo.ontology.CidocSchema;
 import com.nerisa.datarepo.ontology.Connection;
 import com.nerisa.datarepo.ontology.SosaSchema;
 import com.nerisa.datarepo.utils.Constant;

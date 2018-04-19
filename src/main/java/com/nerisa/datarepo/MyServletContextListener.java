@@ -3,13 +3,10 @@ package com.nerisa.datarepo;
 import com.nerisa.datarepo.job.UserEngagementJob;
 import com.nerisa.datarepo.ontology.Connection;
 import org.apache.jena.fuseki.embedded.FusekiServer;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.tdb.TDBFactory;
 import org.quartz.*;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

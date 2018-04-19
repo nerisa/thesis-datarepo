@@ -1,7 +1,6 @@
 package com.nerisa.datarepo.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 /**
  * Created by nerisa on 3/14/18.

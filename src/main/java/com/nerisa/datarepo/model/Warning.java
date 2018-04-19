@@ -3,9 +3,7 @@ package com.nerisa.datarepo.model;
 import com.nerisa.datarepo.utils.Constant;
 import org.json.simple.JSONObject;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 /**
  * Created by nerisa on 3/13/18.

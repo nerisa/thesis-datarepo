@@ -1,23 +1,12 @@
 package com.nerisa.datarepo.ontology;
 
-import org.apache.jena.ontology.*;
-import org.apache.jena.query.*;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.reasoner.Reasoner;
-import org.apache.jena.reasoner.ReasonerRegistry;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.tdb.TDBFactory;
-import org.apache.jena.update.UpdateExecutionFactory;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateProcessor;
-import org.apache.jena.update.UpdateRequest;
-import org.apache.jena.util.FileManager;
-
-import java.io.*;
-import java.util.Iterator;
 
 /**
  * Created by nerisa on 3/19/18.
