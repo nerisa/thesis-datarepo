@@ -31,25 +31,20 @@ public class MyServletContextListener implements ServletContextListener {
 
         try {
             sched = schedFact.getScheduler();
-
-
             JobDetail job = newJob(UserEngagementJob.class)
                     .withIdentity("UserEngagementJob", "group1") // name "myJob", group "group1"
                     .build();
 
-            // Trigger the job to run now, and then every 40 seconds
+            // Trigger the job to run now, and then every half hour
             Trigger trigger = newTrigger()
                     .withIdentity("engagementTrigger", "group1")
                     .startNow()
-                    .withSchedule(cronSchedule("0 0 0/1 * * ?"))
+                    .withSchedule(cronSchedule("0 0/30 * * * ?"))
                     .build();
 
             // Tell quartz to schedule the job using our trigger
             sched.start();
             sched.scheduleJob(job, trigger);
-
-
-
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
