@@ -378,6 +378,7 @@ public class DatabaseQuery {
             statement = dbCon.prepareStatement(query);
             statement.setString(1, user.getToken());
             statement.setLong(2, user.getId());
+            LOG.log(Level.INFO, "user token update statement: " + statement.toString());
             boolean result = statement.execute();
             if (!result) {
                 LOG.log(Level.SEVERE, "Could not update user token for " + user.getEmail());

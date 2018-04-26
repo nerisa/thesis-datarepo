@@ -10,7 +10,7 @@ import java.sql.SQLException;
  */
 public class ConnectionManger {
 
-    private static final String database = "thesis_test";
+    private static final String database = "thesis";
     private static final String userName = "root";
     private static final String password = "n";
 

@@ -13,20 +13,20 @@ import org.apache.jena.tdb.TDBFactory;
  */
 public class Connection {
 
-    public static final String DATABASE = "/home/nerisa/codehome/project/java/thesis-datarepo/MyDatabases/test";
+    public static final String DATABASE = "/home/MyDatabases/test";
     public static OntModel model;
     public static Dataset dataset = TDBFactory.createDataset(DATABASE);
 
     public static OntModel getModel(){
 
         final OntModel cidocModel = ModelFactory.createOntologyModel( OntModelSpec.RDFS_MEM );
-        cidocModel.read( "/home/nerisa/codehome/project/java/thesis-datarepo/src/main/resources/cidoc_crm.rdfs" );
+        cidocModel.read( "cidoc_crm.rdfs" );
 
         final OntModel sosaModel = ModelFactory.createOntologyModel( OntModelSpec.RDFS_MEM );
-        sosaModel.read("/home/nerisa/codehome/project/java/thesis-datarepo/src/main/resources/sosa.ttl");
+        sosaModel.read("sosa.ttl");
 
         final OntModel qudtModel = ModelFactory.createOntologyModel( OntModelSpec.RDFS_MEM );
-        qudtModel.read("/home/nerisa/codehome/project/java/thesis-datarepo/src/main/resources/qudt.owl");
+        qudtModel.read("qudt.owl");
 
         Model model = dataset.getDefaultModel();
 
