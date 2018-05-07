@@ -16,17 +16,31 @@ import java.util.logging.Logger;
 public class DatabaseQuery {
 
     private static final Logger LOG = Logger.getLogger(DatabaseQuery.class.getName());
-    private static Connection dbCon = ConnectionManger.getConnection();
+    private static Connection dbCon;
     private static final String APP_DATA_TABLE = "app_data";
     private static final String USER_TABLE = "user";
     private static final String MONUMENT_TABLE = "monument_data";
     private static final String WARNING_TABLE = "unverified_warning";
+
+
+    private static void createConnection(){
+        if(dbCon == null){
+            dbCon = ConnectionManger.getConnection();
+        }
+    }
+
+    private static void closeConnection() throws SQLException{
+        if(dbCon!=null){
+            dbCon.close();
+        }
+    }
 
     public static Long getLastMonumentId() throws SQLException{
         Long monumentId = 0l;
         String query = "SELECT monument_id FROM " + APP_DATA_TABLE;
         Statement statement = null;
         ResultSet resultSet = null;
+        createConnection();
         try {
             statement = dbCon.createStatement();
             resultSet = statement.executeQuery(query);
@@ -36,7 +50,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return monumentId;
     }
@@ -51,6 +65,7 @@ public class DatabaseQuery {
             query = "UPDATE " + APP_DATA_TABLE + " SET monument_id = monument_id+1";
         }
         PreparedStatement statement = null;
+        createConnection();
         try {
             statement = dbCon.prepareStatement(query);
             int result = statement.executeUpdate();
@@ -60,13 +75,14 @@ public class DatabaseQuery {
             }
         } finally {
             if (statement != null){ statement.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
     }
 
     public static void incrementTemperatureId(Long monumentId) throws  SQLException{
         String query = "UPDATE " + MONUMENT_TABLE + " SET temp_id = temp_id + 1 WHERE monument_id = " + monumentId;
         PreparedStatement statement = null;
+        createConnection();
         try {
             statement = dbCon.prepareStatement(query);
             int result = statement.executeUpdate();
@@ -76,13 +92,14 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null){ statement.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
     }
 
     public static void incrementNoiseId(Long monumentId) throws SQLException{
         String query = "UPDATE " + MONUMENT_TABLE + " SET noise_id = noise_id + 1 WHERE monument_id = " + monumentId;
         PreparedStatement statement = null;
+        createConnection();
         try {
             statement = dbCon.prepareStatement(query);
             int result = statement.executeUpdate();
@@ -92,7 +109,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null){ statement.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
     }
 
@@ -100,6 +117,7 @@ public class DatabaseQuery {
         String query = "INSERT INTO " + MONUMENT_TABLE + " (monument_id, temp_id, noise_id, warning_id, post_id) VALUES (?,?,?,?,?)";
         LOG.log(Level.INFO, "inserting ids for resources for monument "+ monumentId);
         PreparedStatement statement = null;
+        createConnection();
         try {
             statement = dbCon.prepareStatement(query);
             statement.setLong(1, monumentId);
@@ -114,7 +132,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null){ statement.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
     }
 
@@ -143,6 +161,7 @@ public class DatabaseQuery {
         String updateQuery = "UPDATE " + MONUMENT_TABLE + " SET warning_id = warning_id + 1 WHERE monument_id = ?";
         int result = 0;
         PreparedStatement ps = null;
+        createConnection();
         try {
             if (getNextWarningId(monumentId) == 0l) {
                 ps = dbCon.prepareStatement(insertQuery);
@@ -160,7 +179,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (ps != null){ ps.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
     }
 
@@ -168,6 +187,7 @@ public class DatabaseQuery {
         String insertQuery = "INSERT INTO " + MONUMENT_TABLE + "(monument_id, post_id) VALUES (?, ?)";
         String updateQuery = "UPDATE " + MONUMENT_TABLE + " SET post_id = post_id + 1 WHERE monument_id = ?";
         PreparedStatement ps = null;
+        createConnection();
         try {
             if (getNextPostId(monumentId) == 0l) {
                 ps = dbCon.prepareStatement(insertQuery);
@@ -181,7 +201,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (ps != null){ ps.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
     }
 
@@ -190,6 +210,7 @@ public class DatabaseQuery {
         String selectQuery = "SELECT temp_id FROM " +  MONUMENT_TABLE + " WHERE monument_id = " + monumentId;
         Statement statement = null;
         ResultSet resultSet = null;
+        createConnection();
         try {
             statement = dbCon.createStatement();
             resultSet = statement.executeQuery(selectQuery);
@@ -199,7 +220,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return tempId;
     }
@@ -209,6 +230,7 @@ public class DatabaseQuery {
         String selectQuery = "SELECT noise_id FROM " +  MONUMENT_TABLE + " WHERE monument_id = " + monumentId;
         Statement statement = null;
         ResultSet resultSet = null;
+        createConnection();
         try {
             statement = dbCon.createStatement();
             resultSet = statement.executeQuery(selectQuery);
@@ -218,7 +240,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return noiseId;
     }
@@ -228,6 +250,7 @@ public class DatabaseQuery {
         String selectQuery = "SELECT post_id FROM " +  MONUMENT_TABLE + " WHERE monument_id = " + monumentId;
         Statement statement = null;
         ResultSet resultSet = null;
+        createConnection();
         try {
             statement = dbCon.createStatement();
             resultSet = statement.executeQuery(selectQuery);
@@ -237,7 +260,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return postId;
     }
@@ -248,6 +271,7 @@ public class DatabaseQuery {
         String selectQuery = "SELECT warning_id FROM " +  MONUMENT_TABLE + " WHERE monument_id = " + monumentId;
         Statement statement = null;
         ResultSet resultSet = null;
+        createConnection();
         try {
             statement = dbCon.createStatement();
             resultSet = statement.executeQuery(selectQuery);
@@ -257,7 +281,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return warningId;
     }
@@ -267,6 +291,7 @@ public class DatabaseQuery {
         LOG.log(Level.INFO, "Inserting a new unverified warning for monument "+ monumentId);
         PreparedStatement statement = null;
         ResultSet generatedKeys = null;
+        createConnection();
         try {
             statement = dbCon.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, monumentId);
@@ -288,7 +313,7 @@ public class DatabaseQuery {
         } finally {
             if (statement != null){ statement.close(); }
             if (generatedKeys != null){ generatedKeys.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return warning;
     }
@@ -297,6 +322,7 @@ public class DatabaseQuery {
         String deleteQuery = "DELETE FROM " + WARNING_TABLE +" WHERE id = " + warning.getId();
         LOG.log(Level.INFO, "Deleting warning as unverified "+ warning.getId());
         PreparedStatement statement = null;
+        createConnection();
         try {
             statement = dbCon.prepareStatement(deleteQuery);
             int result = statement.executeUpdate();
@@ -306,7 +332,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null){ statement.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
     }
 
@@ -316,6 +342,7 @@ public class DatabaseQuery {
         LOG.log(Level.INFO, "Getting warnings: " + query);
         Statement statement = null;
         ResultSet result = null;
+        createConnection();
         try {
             statement = dbCon.createStatement();
             result = statement.executeQuery(query);
@@ -331,7 +358,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
             if (result != null){ result.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return warningList;
     }
@@ -341,6 +368,7 @@ public class DatabaseQuery {
         LOG.log(Level.INFO, "Creating new user "+ user.getEmail());
         PreparedStatement statement = null;
         ResultSet generatedKeys = null;
+        createConnection();
         try {
             statement = dbCon.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, user.getEmail());
@@ -362,7 +390,7 @@ public class DatabaseQuery {
         } finally {
             if (statement != null){ statement.close(); }
             if (generatedKeys != null){ generatedKeys.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return user;
     }
@@ -374,6 +402,7 @@ public class DatabaseQuery {
         String query = "UPDATE " + USER_TABLE + " SET token = ? WHERE id = ?";
         LOG.log(Level.INFO, "Updating user with query: " + query);
         PreparedStatement statement = null;
+        createConnection();
         try {
             statement = dbCon.prepareStatement(query);
             statement.setString(1, user.getToken());
@@ -386,7 +415,7 @@ public class DatabaseQuery {
             }
         } finally {
             if (statement != null) { statement.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return Boolean.TRUE;
     }
@@ -397,6 +426,7 @@ public class DatabaseQuery {
         LOG.log(Level.INFO, "Getting user with query: " + query);
         Statement statement = null;
         ResultSet resultSet = null;
+        createConnection();
         try {
             statement = dbCon.createStatement();
             resultSet = statement.executeQuery(query);
@@ -410,7 +440,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return user;
     }
@@ -421,6 +451,7 @@ public class DatabaseQuery {
         LOG.log(Level.INFO, "Getting user with query: " + query);
         Statement statement = null;
         ResultSet resultSet = null;
+        createConnection();
         try {
             statement = dbCon.createStatement();
             resultSet = statement.executeQuery(query);
@@ -434,7 +465,7 @@ public class DatabaseQuery {
         } finally {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return user;
     }
@@ -444,6 +475,7 @@ public class DatabaseQuery {
         LOG.log(Level.INFO, "Updating user custodian status to " + status + " for user: " + user.getEmail());
         String query = "UPDATE " + USER_TABLE + " SET is_custodian = ? WHERE id = ?";
         PreparedStatement statement = null;
+        createConnection();
         try{
             statement = dbCon.prepareStatement(query);
             statement.setBoolean(1, status);
@@ -455,6 +487,7 @@ public class DatabaseQuery {
             }
         } finally {
             if (statement != null){ statement.close(); }
+            closeConnection();
         }
         return Boolean.TRUE;
     }
@@ -463,6 +496,7 @@ public class DatabaseQuery {
         LOG.log(Level.INFO, "Updating user monument_id to " + monumentId + " for user: " + user.getEmail());
         String query = "UPDATE " + USER_TABLE + " SET monument_id = ? WHERE id = ?";
         PreparedStatement statement = null;
+        createConnection();
         try {
             statement = dbCon.prepareStatement(query);
             statement.setLong(1, monumentId);
@@ -474,6 +508,7 @@ public class DatabaseQuery {
             }
         }finally {
             if (statement != null) { statement.close();}
+            closeConnection();
         }
         return Boolean.TRUE;
     }
@@ -484,6 +519,7 @@ public class DatabaseQuery {
         String query = "UPDATE " + USER_TABLE + " SET score = ? WHERE id = ?";
 
         PreparedStatement updateStatement = null;
+        createConnection();
         try{
             updateStatement = dbCon.prepareStatement(query);
             updateStatement.setInt(1,(previousScore + score));
@@ -495,6 +531,7 @@ public class DatabaseQuery {
             }
         } finally {
             if (updateStatement != null) { updateStatement.close(); }
+            closeConnection();
         }
 
         return (previousScore+score);
@@ -506,6 +543,7 @@ public class DatabaseQuery {
         int userScore = 0;
         Statement statement = null;
         ResultSet resultSet = null;
+        createConnection();
         try {
             statement = dbCon.createStatement();
             resultSet = statement.executeQuery(selectQuery);
@@ -515,7 +553,9 @@ public class DatabaseQuery {
         }finally {
             if(statement!=null)
                 statement.close();
+            closeConnection();
         }
+
         return userScore;
     }
 
@@ -527,6 +567,7 @@ public class DatabaseQuery {
         LOG.log(Level.INFO, "Getting old custodians query: " + query);
         ResultSet resultSet = null;
         Statement statement = null;
+        createConnection();
         try{
             statement = dbCon.createStatement();
             resultSet = statement.executeQuery(query);
@@ -543,7 +584,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null) { statement.close();}
             if (resultSet != null){ resultSet.close(); }
-//            if (dbCon != null){ dbCon.close(); }
+            closeConnection();
         }
         return userList;
     }
