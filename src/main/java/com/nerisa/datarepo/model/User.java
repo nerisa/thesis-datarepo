@@ -1,5 +1,6 @@
 package com.nerisa.datarepo.model;
 
+import com.nerisa.datarepo.incentive.CustodianLevel;
 import com.nerisa.datarepo.utils.Constant;
 
 /**
@@ -13,6 +14,7 @@ public class User {
     private Long lastLoggedIn;
     private boolean isCustodian;
     private long monumentId;
+    private CustodianLevel level;
 
     public User(){}
 
@@ -74,5 +76,13 @@ public class User {
 
     public void setMonumentId(long monumentId) {
         this.monumentId = monumentId;
+    }
+
+    public CustodianLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(CustodianLevel level) {
+        this.level = level;
     }
 }

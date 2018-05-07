@@ -3,6 +3,7 @@ package com.nerisa.datarepo.rdbms;
 import com.nerisa.datarepo.model.Monument;
 import com.nerisa.datarepo.model.User;
 import com.nerisa.datarepo.model.Warning;
+import com.nerisa.datarepo.service.IncentiveService;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -461,6 +462,7 @@ public class DatabaseQuery {
                 user.setToken(resultSet.getString("token"));
                 user.setCustodian(resultSet.getBoolean("is_custodian"));
                 user.setMonumentId(resultSet.getLong("monument_id"));
+                user.setLevel(IncentiveService.getLevel(resultSet.getInt("score")));
             }
         } finally {
             if (statement != null){ statement.close(); }
