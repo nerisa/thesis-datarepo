@@ -21,9 +21,10 @@ public class WarningsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getWarnings(@PathParam("id")Long id){
-        Monument monument = MonumentService.getMonument(id);
-        List<Warning> warningList = MonumentService.getWarnings(monument);
-        List<Warning> unverifiedWarning = MonumentService.getUnverifiedWarnings(monument);
+        MonumentService monumentService = new MonumentService();
+        Monument monument = monumentService.getMonument(id);
+        List<Warning> warningList = monumentService.getWarnings(monument);
+        List<Warning> unverifiedWarning = monumentService.getUnverifiedWarnings(monument);
         warningList.addAll(unverifiedWarning);
         return Response.status(Response.Status.OK).entity(warningList).build();
     }

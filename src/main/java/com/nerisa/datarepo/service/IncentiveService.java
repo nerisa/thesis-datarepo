@@ -5,6 +5,7 @@ import com.nerisa.datarepo.incentive.CustodianTask;
 import com.nerisa.datarepo.model.*;
 import com.nerisa.datarepo.rdbms.DatabaseQuery;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,14 +16,15 @@ import java.util.logging.Logger;
 public class IncentiveService {
 
     private final static Logger LOG = Logger.getLogger(IncentiveService.class.getSimpleName());
+    DatabaseQuery databaseQuery = new DatabaseQuery();
 
-    public static void addIncentive(User user, CustodianTask task){
+    public void addIncentive(User user, CustodianTask task){
         LOG.log(Level.INFO, "Adding incentive for user: " + user.getId());
         try {
 
             int pointsGained = task.getScore();
-            int previousScore = DatabaseQuery.getUserScore(user);
-            DatabaseQuery.updateUserScore(user, pointsGained);
+            int previousScore = databaseQuery.getUserScore(user);
+            databaseQuery.updateUserScore(user, pointsGained);
             CustodianLevel previousLevel = getLevel(previousScore);
             CustodianLevel nextLevel = getLevel(pointsGained + previousScore);
             if((previousLevel != null && previousLevel != nextLevel) || (previousLevel == null && nextLevel != null)){
@@ -35,7 +37,7 @@ public class IncentiveService {
         }
     }
 
-    public static void addIncentive(User custodian, Monument monument){
+    public void addIncentive(User custodian, Monument monument){
         if(monument.getReference()!= null){
             addIncentive(custodian, CustodianTask.ADD_WIKI);
         } else {
@@ -43,13 +45,13 @@ public class IncentiveService {
         }
     }
 
-    public static void addIncentive(User custodian, Post post){
+    public void addIncentive(User custodian, Post post){
         if(custodian.getId() != post.getUserId()){
             addIncentive(custodian, CustodianTask.ADD_INFO);
         }
     }
 
-    public static void addIncentive(User custodian, Warning warning){
+    public void addIncentive(User custodian, Warning warning){
         if (warning.getId() == 1 && warning.isVerified()){
             addIncentive(custodian, CustodianTask.VERIFY_FIRST);
         } else if (warning.isVerified()){
@@ -59,12 +61,12 @@ public class IncentiveService {
         }
     }
 
-    public static void addIncentive(User custodian, NoiseData noiseData){
+    public void addIncentive(User custodian, NoiseData noiseData){
         addIncentive(custodian, CustodianTask.ADD_ENV_DATA);
     }
 
 
-    public static CustodianLevel getLevel(int score){
+    public CustodianLevel getLevel(int score){
         CustodianLevel level = null;
         if(score < 200){
 

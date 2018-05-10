@@ -18,7 +18,8 @@ import java.util.logging.Logger;
 public class MonumentService {
 
     public static final Logger LOG = Logger.getLogger(MonumentService.class.getName());
-
+//    DatabaseQuery databaseQuery = new DatabaseQuery();
+    IncentiveService incentiveService = new IncentiveService();
 
     /**
      *
@@ -27,7 +28,7 @@ public class MonumentService {
      * @param within distance in meters
      * @return
      */
-    public static List<Monument> getNearestMonuments(double fromLat, double fromLong, double within){
+    public List<Monument> getNearestMonuments(double fromLat, double fromLong, double within){
         LOG.log(Level.INFO, "Getting nearby monument from: (" + fromLat + "," + fromLong + ") within " + within );
         List<Monument> nearbyMonuments = new ArrayList<Monument>();
         final int EARTH_RADIUS = 6371000;
@@ -47,7 +48,7 @@ public class MonumentService {
     }
 
 
-    public static Monument getMonument(Long id){
+    public Monument getMonument(Long id){
         Monument monument = null;
         try{
             monument = MonumentDao.getMonument(id);
@@ -59,23 +60,24 @@ public class MonumentService {
 
 
 
-    public static Post addPost(Post post, Monument monument){
+    public Post addPost(Post post, Monument monument){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         try {
-            Long postId = DatabaseQuery.getNextPostId(monument.getId());
+            Long postId = databaseQuery.getNextPostId(monument.getId());
             if(postId == 0){
                 postId = postId + 1l;
             }
             post.setId(postId);
             PostDao.createPost(post, monument);
-            IncentiveService.addIncentive(monument.getCustodian(), post);
-            DatabaseQuery.incrementPostId(monument.getId());
+            incentiveService.addIncentive(monument.getCustodian(), post);
+            databaseQuery.incrementPostId(monument.getId());
         } catch (Exception e){
             e.printStackTrace();
         }
         return post;
     }
 
-    public static List<Post> getPosts(Long monumentId){
+    public List<Post> getPosts(Long monumentId){
         Monument monument = new Monument();
         monument.setId(monumentId);
         List<Post> posts = new ArrayList<Post>();
@@ -88,7 +90,7 @@ public class MonumentService {
     }
 
 
-    public static TemperatureData getTemp(){
+    public TemperatureData getTemp(){
         TemperatureData  temp = new TemperatureData();
         temp.setDate(new Date().getTime());
         temp.setId(1l);
@@ -96,7 +98,8 @@ public class MonumentService {
         return temp;
     }
 
-    public static Monument saveMonument(Monument monument){
+    public Monument saveMonument(Monument monument){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         LOG.log(Level.INFO, "saving monument data for " + monument.getName());
         Long monumentId = 0l;
         Long warningCount = 0l;
@@ -105,11 +108,11 @@ public class MonumentService {
         Long noiseCount = 0l;
         User custodian = null;
         try{
-            custodian = DatabaseQuery.getUser(monument.getCustodian().getId());
+            custodian = databaseQuery.getUser(monument.getCustodian().getId());
             LOG.log(Level.INFO, "Monument custodian: " + custodian.getId());
 //            Set all information for custodian
             monument.setCustodian(custodian);
-            monumentId = DatabaseQuery.getLastMonumentId() + 1;
+            monumentId = databaseQuery.getLastMonumentId() + 1;
             monument.setId(monumentId);
             MonumentDao.createMonument(monument);
             if(!monument.getTemperatures().isEmpty()) {
@@ -128,7 +131,7 @@ public class MonumentService {
             }
             if(!monument.getWarnings().isEmpty()) {
                 for (Warning warning : monument.getWarnings()) {
-                    DatabaseQuery.saveWarning(warning, monumentId);
+                    databaseQuery.saveWarning(warning, monumentId);
                 }
             }
             if(!monument.getPosts().isEmpty()) {
@@ -138,11 +141,11 @@ public class MonumentService {
                     postCount++;
                 }
             }
-            DatabaseQuery.addMonumentResourceIds(monumentId, warningCount,postCount,tempCount,noiseCount);
-            DatabaseQuery.incrementMonumentId();
-            DatabaseQuery.changeCustodianStatus(Boolean.TRUE, custodian);
-            IncentiveService.addIncentive(custodian, monument);
-            DatabaseQuery.updateMonumentId(custodian, monumentId);
+            databaseQuery.addMonumentResourceIds(monumentId, warningCount,postCount,tempCount,noiseCount);
+            databaseQuery.incrementMonumentId();
+            databaseQuery.changeCustodianStatus(Boolean.TRUE, custodian);
+            incentiveService.addIncentive(custodian, monument);
+            databaseQuery.updateMonumentId(custodian, monumentId);
             LOG.log(Level.INFO, "Monument saved for " + monument.getName());
             return monument;
         }catch (SQLException e){
@@ -152,7 +155,8 @@ public class MonumentService {
     }
 
 
-    public static Warning addUnverifiedWarning(Warning warning, Long monumentId){
+    public Warning addUnverifiedWarning(Warning warning, Long monumentId){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         LOG.log(Level.INFO, "Warning posted for monument" + monumentId);
         Warning savedWarning = new Warning();
         Monument monument = MonumentDao.getMonument(monumentId);
@@ -164,10 +168,10 @@ public class MonumentService {
             if(monument.getCustodian().getId() == warning.getUserId()){
                 savedWarning = addVerifiedWarning(warning, monument);
             } else {
-                savedWarning = DatabaseQuery.saveWarning(warning, monumentId);
-                custodian = DatabaseQuery.getUser(monument.getCustodian().getId());
+                savedWarning = databaseQuery.saveWarning(warning, monumentId);
+                custodian = databaseQuery.getUser(monument.getCustodian().getId());
                 NotificationService.sendNewWarningNotification(savedWarning, monumentId, custodian);
-                IncentiveService.addIncentive(custodian, warning);
+                incentiveService.addIncentive(custodian, warning);
             }
 
         } catch(Exception e){
@@ -177,19 +181,20 @@ public class MonumentService {
         return savedWarning;
     }
 
-    public static Warning addVerifiedWarning(Warning warning, Monument monument){
+    public Warning addVerifiedWarning(Warning warning, Monument monument){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         LOG.log(Level.INFO, "Adding a verified warning for monument" + monument.getName());
         try {
-            Long warningId = DatabaseQuery.getNextWarningId(monument.getId());
+            Long warningId = databaseQuery.getNextWarningId(monument.getId());
             if(warningId == 0){
                 warningId = warningId + 1l;
             }
             warning.setId(warningId);
             WarningDao.createWarning(warning, monument, warningId);
-            DatabaseQuery.incrementWarningId(monument.getId());
+            databaseQuery.incrementWarningId(monument.getId());
             warning.setVerified(Boolean.TRUE);
-            User custodian = DatabaseQuery.getUser(monument.getCustodian().getId());
-            IncentiveService.addIncentive(custodian,warning);
+            User custodian = databaseQuery.getUser(monument.getCustodian().getId());
+            incentiveService.addIncentive(custodian,warning);
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -197,7 +202,7 @@ public class MonumentService {
     }
 
 
-    public static List<Warning> getWarnings(Monument monument){
+    public List<Warning> getWarnings(Monument monument){
 //        Warning warning1 = new Warning("This monument has cracks", "https://firebasestorage.googleapis.com/v0/b/custodian-3e7c1.appspot.com/o/images%2F1d32ef44-0eec-46ca-8001-e47d79646371?alt=media&token=c8466137-e2a3-4e56-b2a1-01554c3c5b0f", new Date().getTime());
 //        Warning warning2 = new Warning("This monument has cracks", "https://firebasestorage.googleapis.com/v0/b/custodian-3e7c1.appspot.com/o/images%2F1d32ef44-0eec-46ca-8001-e47d79646371?alt=media&token=c8466137-e2a3-4e56-b2a1-01554c3c5b0f", new Date().getTime());
 //        Warning warning3 = new Warning("This monument has cracks", "https://firebasestorage.googleapis.com/v0/b/custodian-3e7c1.appspot.com/o/images%2F1d32ef44-0eec-46ca-8001-e47d79646371?alt=media&token=c8466137-e2a3-4e56-b2a1-01554c3c5b0f", new Date().getTime());
@@ -216,39 +221,42 @@ public class MonumentService {
         return warnings;
     }
 
-    public static void changeWarningStatus(Warning warning, Long monumentId){
+    public void changeWarningStatus(Warning warning, Long monumentId){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
        Monument monument = MonumentDao.getMonument(monumentId);
         try {
             if(warning.isVerified()) {
-                Long verifiedWarningId = DatabaseQuery.getNextWarningId(monumentId);
+                Long verifiedWarningId = databaseQuery.getNextWarningId(monumentId);
                 WarningDao.createWarning(warning, monument, verifiedWarningId);
-                DatabaseQuery.incrementWarningId(monumentId);
-                DatabaseQuery.deleteWarning(warning);
+                databaseQuery.incrementWarningId(monumentId);
+                databaseQuery.deleteWarning(warning);
                 warning.setId(verifiedWarningId);
             } else {
-                DatabaseQuery.deleteWarning(warning);
+                databaseQuery.deleteWarning(warning);
             }
-            User user = DatabaseQuery.getUser(monument.getCustodian().getId());
-            IncentiveService.addIncentive(user,warning);
+            User user = databaseQuery.getUser(monument.getCustodian().getId());
+            incentiveService.addIncentive(user,warning);
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public static List<Warning> getUnverifiedWarnings(Monument monument){
+    public List<Warning> getUnverifiedWarnings(Monument monument){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         List<Warning> unverifiedWarningList = new ArrayList<Warning>();
         try{
-            unverifiedWarningList = DatabaseQuery.getWarnings(monument);
+            unverifiedWarningList = databaseQuery.getWarnings(monument);
         }catch (SQLException e){
             LOG.log(Level.SEVERE, "Error when retrieving unverified warning for monument " + monument.getId() + ":\n" + e.getStackTrace());
         }
         return unverifiedWarningList;
     }
 
-    public static User createUser(User user){
+    public User createUser(User user){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         User savedUser = null;
         try{
-            User existingUser = DatabaseQuery.getUser(user.getEmail());
+            User existingUser = databaseQuery.getUser(user.getEmail());
             if(existingUser.getId() != null) {
                 LOG.log(Level.INFO, "User with email " + user.getEmail() + " already exists");
                 existingUser.setToken(user.getToken());
@@ -260,61 +268,78 @@ public class MonumentService {
                 user.setLastLoggedIn(new Date().getTime());
                 user.setCustodian(Boolean.FALSE);
 
-                savedUser = DatabaseQuery.createUser(user);
+                savedUser = createNewUser(user);
             }
         } catch (SQLException e){
             LOG.log(Level.SEVERE, e.getMessage());
         }
-        LOG.log(Level.INFO, "User "+ user.getEmail() + " has id " + savedUser.getId());
+        if(savedUser!= null) {
+            LOG.log(Level.INFO, "User " + user.getEmail() + " has id " + savedUser.getId());
+        }
         return savedUser;
     }
 
-    public static boolean updateUserToken(User user){
+    public User createNewUser(User user){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
+        User savedUser = null;
+        try {
+            savedUser = databaseQuery.createUser(user);
+        }catch (SQLException e){
+            LOG.log(Level.SEVERE, e.getMessage());
+        }
+        return savedUser;
+    }
+
+    public boolean updateUserToken(User user){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         LOG.log(Level.INFO, "Updating user token for " + user.getToken());
         boolean success = Boolean.FALSE;
         try{
-            success = DatabaseQuery.updateUserToken(user);
+            success = databaseQuery.updateUserToken(user);
         } catch (SQLException e){
             LOG.log(Level.SEVERE, e.getMessage());
         }
         return success;
     }
 
-    public static void addNoise(Monument monument, NoiseData noise){
+    public void addNoise(Monument monument, NoiseData noise){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         LOG.log(Level.INFO, "Adding noise for monument " + monument.getId());
         try {
-            Long noiseId = DatabaseQuery.getNextNoiseId(monument.getId());
+            Long noiseId = databaseQuery.getNextNoiseId(monument.getId());
             noise.setId(noiseId);
             NoiseDao.addNoiseData(noise, monument);
-            DatabaseQuery.incrementNoiseId(monument.getId());
-            User user = DatabaseQuery.getUser(monument.getCustodian().getId());
-            IncentiveService.addIncentive(user,noise);
+            databaseQuery.incrementNoiseId(monument.getId());
+            User user = databaseQuery.getUser(monument.getCustodian().getId());
+            incentiveService.addIncentive(user,noise);
         }catch (SQLException e){
             LOG.log(Level.SEVERE, e.getMessage());
         }
     }
 
-    public static void addTemperature(Monument monument, TemperatureData temperatureData){
+    public  void addTemperature(Monument monument, TemperatureData temperatureData){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         LOG.log(Level.INFO, "Adding temperature data for monument " + monument.getId());
         try{
-            Long temperatureId = DatabaseQuery.getNextTemperatureId(monument.getId());
+            Long temperatureId = databaseQuery.getNextTemperatureId(monument.getId());
             temperatureData.setId(temperatureId);
             TemperatureDao.addTemperatureData(temperatureData, monument);
-            DatabaseQuery.incrementTemperatureId(monument.getId());
+            databaseQuery.incrementTemperatureId(monument.getId());
         }catch (SQLException e){
             LOG.log(Level.SEVERE, e.getMessage());
         }
     }
 
-    public static JSONObject getConsolidateMonumentData(Monument monument){
+    public JSONObject getConsolidateMonumentData(Monument monument){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         JSONObject object = new JSONObject();
         try {
             object.put("name", monument.getName());
             object.put("id", monument.getId());
             object.put("latitude", monument.getLatitude());
             object.put("longitude", monument.getLongitude());
-            object.put("warningCount", DatabaseQuery.getNextWarningId(monument.getId()) - 1);
-            object.put("postCount", DatabaseQuery.getNextPostId(monument.getId()) - 1);
+            object.put("warningCount", databaseQuery.getNextWarningId(monument.getId()) - 1);
+            object.put("postCount", databaseQuery.getNextPostId(monument.getId()) - 1);
             object.put("monumentPhoto", monument.getMonumentPhoto());
             object.put("custodian", monument.getCustodian());
             if(monument.getReference() != null) {

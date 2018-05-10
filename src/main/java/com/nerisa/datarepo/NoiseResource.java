@@ -18,10 +18,11 @@ public class NoiseResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addNoise(@PathParam("id")Long id, NoiseData noiseData){
+        MonumentService monumentService = new MonumentService();
         try {
-            Monument monument = MonumentService.getMonument(id);
+            Monument monument = monumentService.getMonument(id);
             if(monument != null) {
-                MonumentService.addNoise(monument, noiseData);
+                monumentService.addNoise(monument, noiseData);
                 return Response.status(Response.Status.OK).entity(noiseData).build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND).build();

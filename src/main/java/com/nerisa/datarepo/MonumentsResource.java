@@ -24,7 +24,8 @@ public class MonumentsResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response getMonuments(@QueryParam("lat") double latitude, @QueryParam("lon") double longitude, @QueryParam("within") int within){
-        List<Monument> monuments = MonumentService.getNearestMonuments(latitude, longitude, within);
+        MonumentService monumentService = new MonumentService();
+        List<Monument> monuments = monumentService.getNearestMonuments(latitude, longitude, within);
         GenericEntity<List<Monument>> entity = new GenericEntity<List<Monument>>(monuments) {};
         return Response.status(200).entity(entity).build();
     }

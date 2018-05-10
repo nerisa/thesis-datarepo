@@ -19,7 +19,8 @@ public class WarningResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createWarning(@PathParam("id")Long id, Warning warning){
-        Warning savedWarning = MonumentService.addUnverifiedWarning(warning, id);
+        MonumentService monumentService = new MonumentService();
+        Warning savedWarning = monumentService.addUnverifiedWarning(warning, id);
         return Response.status(Response.Status.OK).entity(savedWarning).build();
     }
 
@@ -29,8 +30,9 @@ public class WarningResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{warningId}")
     public Response modifyWarning(@PathParam("id")Long id, @PathParam("warningId")Long warningId, Warning warning){
+        MonumentService monumentService = new MonumentService();
         warning.setId(warningId);
-        MonumentService.changeWarningStatus(warning, id);
+        monumentService.changeWarningStatus(warning, id);
         return Response.status((Response.Status.OK)).entity(warning).build();
     }
 

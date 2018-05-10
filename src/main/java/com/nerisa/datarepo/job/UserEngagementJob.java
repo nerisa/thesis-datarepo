@@ -5,6 +5,7 @@ import com.nerisa.datarepo.model.NoiseData;
 import com.nerisa.datarepo.model.User;
 import com.nerisa.datarepo.rdbms.DatabaseQuery;
 import com.nerisa.datarepo.service.NotificationService;
+import com.nerisa.datarepo.utils.Constant;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -25,12 +26,14 @@ public class UserEngagementJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         LOG.log(Level.INFO, "Checking user engagements");
-//        Long oldTime = (System.currentTimeMillis() - (Constant.OLD_DATA_DAYS * Constant.DAY_IN_MS));
-        Long oldTime = System.currentTimeMillis();
+//        oldTime = 7 days earlier time
+        Long oldTime = (System.currentTimeMillis() - (Constant.OLD_DATA_DAYS * Constant.DAY_IN_MS));
+//        Long oldTime = System.currentTimeMillis();
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         try {
-            List<User> custodians = DatabaseQuery.getAllOldCustodians();
+            List<User> custodians = databaseQuery.getAllOldCustodians();
             for(User user: custodians){
-                Long latestNoiseId = DatabaseQuery.getNextNoiseId(user.getMonumentId()) - 1;
+                Long latestNoiseId = databaseQuery.getNextNoiseId(user.getMonumentId()) - 1;
                 NoiseData noiseData = NoiseDao.getNoiseData(latestNoiseId, user.getMonumentId());
                 if (noiseData.getDate() < oldTime){
                     LOG.log(Level.INFO, "User " + user.getId() + " is being sent a notification");

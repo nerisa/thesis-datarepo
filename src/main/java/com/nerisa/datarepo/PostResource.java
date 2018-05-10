@@ -21,15 +21,17 @@ public class PostResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createPost(@PathParam("id")Long id, Post post){
-        Monument monument = MonumentService.getMonument(id);
-        Post savedPost = MonumentService.addPost(post, monument);
+        MonumentService monumentService = new MonumentService();
+        Monument monument = monumentService.getMonument(id);
+        Post savedPost = monumentService.addPost(post, monument);
         return Response.status(Response.Status.OK).entity(savedPost).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPosts(@PathParam("id") Long id){
-        List<Post> postList = MonumentService.getPosts(id);
+        MonumentService monumentService = new MonumentService();
+        List<Post> postList = monumentService.getPosts(id);
         return Response.status(Response.Status.OK).entity(postList).build();
     }
 

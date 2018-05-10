@@ -23,8 +23,9 @@ public class MonumentResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createMonument(Monument monument){
         LOG.log(Level.INFO, "Adding a new monument");
+        MonumentService monumentService = new MonumentService();
         try {
-            MonumentService.saveMonument(monument);
+            monumentService.saveMonument(monument);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -35,9 +36,10 @@ public class MonumentResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response get(@PathParam("id") Long id, @QueryParam("compact") boolean compact){
-        Monument monument = MonumentService.getMonument(id);
+        MonumentService monumentService = new MonumentService();
+        Monument monument = monumentService.getMonument(id);
         if(compact){
-            JSONObject object = MonumentService.getConsolidateMonumentData(monument);
+            JSONObject object = monumentService.getConsolidateMonumentData(monument);
             return Response.status(Response.Status.OK).entity(object).build();
         } else {
             return Response.status(Response.Status.OK).entity(monument).build();

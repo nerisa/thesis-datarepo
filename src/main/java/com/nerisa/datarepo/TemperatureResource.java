@@ -18,10 +18,11 @@ public class TemperatureResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addTemperature(@PathParam("id")Long id, TemperatureData temperatureData){
+        MonumentService monumentService = new MonumentService();
         try {
-            Monument monument = MonumentService.getMonument(id);
+            Monument monument = monumentService.getMonument(id);
             if(monument != null) {
-                MonumentService.addTemperature(monument, temperatureData);
+                monumentService.addTemperature(monument, temperatureData);
                 return Response.status(Response.Status.OK).entity(temperatureData).build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND).build();
