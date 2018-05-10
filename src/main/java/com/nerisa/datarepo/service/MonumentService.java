@@ -71,6 +71,7 @@ public class MonumentService {
             PostDao.createPost(post, monument);
             incentiveService.addIncentive(monument.getCustodian(), post);
             databaseQuery.incrementPostId(monument.getId());
+            databaseQuery.destroy();
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -146,6 +147,7 @@ public class MonumentService {
             databaseQuery.changeCustodianStatus(Boolean.TRUE, custodian);
             incentiveService.addIncentive(custodian, monument);
             databaseQuery.updateMonumentId(custodian, monumentId);
+            databaseQuery.destroy();
             LOG.log(Level.INFO, "Monument saved for " + monument.getName());
             return monument;
         }catch (SQLException e){
@@ -173,7 +175,7 @@ public class MonumentService {
                 NotificationService.sendNewWarningNotification(savedWarning, monumentId, custodian);
                 incentiveService.addIncentive(custodian, warning);
             }
-
+            databaseQuery.destroy();
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -195,6 +197,7 @@ public class MonumentService {
             warning.setVerified(Boolean.TRUE);
             User custodian = databaseQuery.getUser(monument.getCustodian().getId());
             incentiveService.addIncentive(custodian,warning);
+            databaseQuery.destroy();
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -235,6 +238,7 @@ public class MonumentService {
                 databaseQuery.deleteWarning(warning);
             }
             User user = databaseQuery.getUser(monument.getCustodian().getId());
+            databaseQuery.destroy();
             incentiveService.addIncentive(user,warning);
         } catch (Exception e){
             e.printStackTrace();
@@ -246,6 +250,7 @@ public class MonumentService {
         List<Warning> unverifiedWarningList = new ArrayList<Warning>();
         try{
             unverifiedWarningList = databaseQuery.getWarnings(monument);
+            databaseQuery.destroy();
         }catch (SQLException e){
             LOG.log(Level.SEVERE, "Error when retrieving unverified warning for monument " + monument.getId() + ":\n" + e.getStackTrace());
         }
@@ -267,9 +272,9 @@ public class MonumentService {
 
                 user.setLastLoggedIn(new Date().getTime());
                 user.setCustodian(Boolean.FALSE);
-
-                savedUser = createNewUser(user);
+                savedUser = databaseQuery.createUser(user);
             }
+            databaseQuery.destroy();
         } catch (SQLException e){
             LOG.log(Level.SEVERE, e.getMessage());
         }
@@ -279,16 +284,6 @@ public class MonumentService {
         return savedUser;
     }
 
-    public User createNewUser(User user){
-        DatabaseQuery databaseQuery = new DatabaseQuery();
-        User savedUser = null;
-        try {
-            savedUser = databaseQuery.createUser(user);
-        }catch (SQLException e){
-            LOG.log(Level.SEVERE, e.getMessage());
-        }
-        return savedUser;
-    }
 
     public boolean updateUserToken(User user){
         DatabaseQuery databaseQuery = new DatabaseQuery();
@@ -296,6 +291,7 @@ public class MonumentService {
         boolean success = Boolean.FALSE;
         try{
             success = databaseQuery.updateUserToken(user);
+            databaseQuery.destroy();
         } catch (SQLException e){
             LOG.log(Level.SEVERE, e.getMessage());
         }
@@ -311,6 +307,7 @@ public class MonumentService {
             NoiseDao.addNoiseData(noise, monument);
             databaseQuery.incrementNoiseId(monument.getId());
             User user = databaseQuery.getUser(monument.getCustodian().getId());
+            databaseQuery.destroy();
             incentiveService.addIncentive(user,noise);
         }catch (SQLException e){
             LOG.log(Level.SEVERE, e.getMessage());
@@ -325,6 +322,7 @@ public class MonumentService {
             temperatureData.setId(temperatureId);
             TemperatureDao.addTemperatureData(temperatureData, monument);
             databaseQuery.incrementTemperatureId(monument.getId());
+            databaseQuery.destroy();
         }catch (SQLException e){
             LOG.log(Level.SEVERE, e.getMessage());
         }
@@ -346,7 +344,7 @@ public class MonumentService {
                 object.put("reference", monument.getReference());
             }
             object.put("desc", monument.getDesc());
-
+            databaseQuery.destroy();
         }catch (SQLException e){
             LOG.log(Level.SEVERE, e.getMessage());
         }

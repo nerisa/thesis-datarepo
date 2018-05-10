@@ -55,7 +55,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return monumentId;
     }
@@ -81,7 +81,7 @@ public class DatabaseQuery {
         } finally {
             if (statement != null){ statement.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -99,7 +99,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -117,7 +117,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -141,7 +141,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -189,7 +189,7 @@ public class DatabaseQuery {
         }finally {
             if (ps != null){ ps.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -212,7 +212,7 @@ public class DatabaseQuery {
         }finally {
             if (ps != null){ ps.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -232,7 +232,7 @@ public class DatabaseQuery {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return tempId;
     }
@@ -253,7 +253,7 @@ public class DatabaseQuery {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return noiseId;
     }
@@ -274,7 +274,7 @@ public class DatabaseQuery {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return postId;
     }
@@ -296,7 +296,7 @@ public class DatabaseQuery {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return warningId;
     }
@@ -329,7 +329,7 @@ public class DatabaseQuery {
             if (statement != null){ statement.close(); }
             if (generatedKeys != null){ generatedKeys.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return warning;
     }
@@ -349,7 +349,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null){ statement.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
     }
 
@@ -376,7 +376,7 @@ public class DatabaseQuery {
             if (statement != null){ statement.close(); }
             if (result != null){ result.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return warningList;
     }
@@ -409,7 +409,7 @@ public class DatabaseQuery {
             if (statement != null){ statement.close(); }
             if (generatedKeys != null){ generatedKeys.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return user;
     }
@@ -435,7 +435,7 @@ public class DatabaseQuery {
         } finally {
             if (statement != null) { statement.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return Boolean.TRUE;
     }
@@ -461,7 +461,7 @@ public class DatabaseQuery {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return user;
     }
@@ -489,7 +489,7 @@ public class DatabaseQuery {
             if (statement != null){ statement.close(); }
             if (resultSet != null){ resultSet.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return user;
     }
@@ -512,7 +512,7 @@ public class DatabaseQuery {
         } finally {
             if (statement != null){ statement.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return Boolean.TRUE;
     }
@@ -534,7 +534,7 @@ public class DatabaseQuery {
         }finally {
             if (statement != null) { statement.close();}
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return Boolean.TRUE;
     }
@@ -558,7 +558,7 @@ public class DatabaseQuery {
         } finally {
             if (updateStatement != null) { updateStatement.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
 
         return (previousScore+score);
@@ -581,7 +581,7 @@ public class DatabaseQuery {
             if(statement!=null)
                 statement.close();
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
 
         return userScore;
@@ -613,8 +613,12 @@ public class DatabaseQuery {
             if (statement != null) { statement.close();}
             if (resultSet != null){ resultSet.close(); }
 //            closeConnection();
-            if(dbCon != null){ dbCon.close(); }
+//            if(dbCon != null){ dbCon.close(); }
         }
         return userList;
+    }
+
+    public void destroy() throws SQLException{
+        if(dbCon != null){ dbCon.close(); }
     }
 }

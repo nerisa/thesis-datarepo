@@ -16,9 +16,10 @@ import java.util.logging.Logger;
 public class IncentiveService {
 
     private final static Logger LOG = Logger.getLogger(IncentiveService.class.getSimpleName());
-    DatabaseQuery databaseQuery = new DatabaseQuery();
+
 
     public void addIncentive(User user, CustodianTask task){
+        DatabaseQuery databaseQuery = new DatabaseQuery();
         LOG.log(Level.INFO, "Adding incentive for user: " + user.getId());
         try {
 
@@ -32,6 +33,7 @@ public class IncentiveService {
                 LOG.log(Level.INFO, "User " + user.getId() + " has upgraded to " + nextLevel.toString());
                 NotificationService.sendLevelUpgradeNotification(user, nextLevel);
             }
+            databaseQuery.destroy();
         }catch (SQLException e ){
             LOG.log(Level.SEVERE, "Error: " + e.getMessage());
         }

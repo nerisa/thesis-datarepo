@@ -40,6 +40,7 @@ public class UserEngagementJob implements Job {
                     NotificationService.sendGetDataNotification(user);
                 }
             }
+            databaseQuery.destroy();
         }catch (SQLException e){
             LOG.log(Level.SEVERE, e.getMessage());
         }
